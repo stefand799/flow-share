@@ -1,0 +1,161 @@
+.kanban-board-wrapper {
+padding: 20px;
+background-color: #f7fafc;
+border-radius: 8px;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+}
+
+.kanban-columns-grid {
+display: grid;
+grid-template-columns: repeat(1, 1fr);
+gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+.kanban-columns-grid {
+grid-template-columns: repeat(3, 1fr);
+}
+}
+
+.kanban-column {
+background-color: #ffffff;
+border-radius: 8px;
+padding: 1rem;
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+min-height: 400px;
+}
+
+.column-title {
+font-size: 1.25rem;
+font-weight: 600;
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 2px solid #e2e8f0;
+color: #2d3748;
+}
+
+.task-list {
+min-height: 350px;
+}
+
+.task-list.drag-over {
+background-color: #e9f0f7;
+border: 2px dashed #4299e1;
+border-radius: 6px;
+}
+
+.task-card {
+background-color: #f7fafc;
+border-radius: 6px;
+padding: 1rem;
+margin-bottom: 0.75rem;
+cursor: pointer;
+box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+transition: transform 0.2s, box-shadow 0.2s;
+border-left: 5px solid;
+}
+
+.task-card:hover {
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+transform: translateY(-2px);
+}
+
+.task-card.low {
+border-left-color: #48bb78;
+}
+.task-card.medium {
+border-left-color: #ecc94b;
+}
+.task-card.high {
+border-left-color: #f56565;
+}
+
+.task-card:active, .task-card.is-dragging {
+opacity: 0.5;
+transform: scale(0.98);
+}
+
+.task-title {
+font-size: 1rem;
+margin-bottom: 0.25rem;
+line-height: 1.3;
+}
+
+.modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+}
+
+.modal.hidden {
+display: none;
+}
+
+.modal-content {
+background: white;
+padding: 2rem;
+border-radius: 8px;
+max-width: 500px;
+width: 90%;
+box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+margin-bottom: 1rem;
+}
+
+.form-group label {
+display: block;
+font-weight: 600;
+margin-bottom: 0.5rem;
+color: #4a5568;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+width: 100%;
+padding: 0.75rem;
+border: 1px solid #e2e8f0;
+border-radius: 4px;
+box-sizing: border-box;
+}
+
+.button-group {
+display: flex;
+justify-content: flex-end;
+gap: 1rem;
+}
+
+.btn-primary {
+background-color: #4c51bf;
+color: white;
+padding: 0.75rem 1.5rem;
+border-radius: 4px;
+font-weight: 600;
+transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+background-color: #434190;
+}
+
+.btn-secondary {
+background-color: #edf2f7;
+color: #4a5568;
+padding: 0.75rem 1.5rem;
+border-radius: 4px;
+font-weight: 600;
+transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+background-color: #e2e8f0;
+}

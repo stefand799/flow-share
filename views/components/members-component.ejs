@@ -1,0 +1,80 @@
+<div id="members-container" class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-xl">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Group Members</h3>
+    
+    <div data-group-id="<%= groupId %>" id="members-list-wrapper">
+        <% if (members.length === 0) { %>
+            <p class="text-gray-500 italic">No members yet.</p>
+        <% } else { %>
+            <ul id="member-list" class="space-y-2 max-h-80 overflow-y-auto">
+                <% members.forEach(member => { %>
+                    <li 
+                        class="member-list-item text-gray-700 border p-3 rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer flex justify-between items-center"
+                        data-member-id="<%= member.id %>"
+                        data-user-id="<%= member.user.id %>"
+                        data-username="<%= member.user.username %>"
+                        data-is-admin="<%= member.isAdmin %>"
+                        data-email="<%= member.user.emailAddress %>"
+                        data-phone="<%= member.user.phoneNumber || 'N/A' %>"
+                        data-bio="<%= member.user.bio || 'No bio provided.' %>"
+                        data-first-name="<%= member.user.firstName || '' %>"
+                        data-last-name="<%= member.user.lastName || '' %>"
+                    >
+                        <span class="font-medium"><%= member.user.username %></span>
+                        <% if (member.isAdmin) { %>
+                            <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full font-semibold">Admin</span>
+                        <% } %>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } %>
+    </div>
+</div>
+
+<div id="member-detail-modal" class="modal hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
+        <h3 id="modal-username" class="text-2xl font-bold mb-4 text-gray-800 border-b pb-2"></h3>
+        
+        <div id="modal-user-details" class="space-y-3 mb-6">
+            <div class="detail-item">
+                <p class="text-sm font-medium text-gray-500">Full Name</p>
+                <p id="modal-full-name" class="text-base text-gray-900"></p>
+            </div>
+            <div class="detail-item">
+                <p class="text-sm font-medium text-gray-500">Email Address</p>
+                <p id="modal-email" class="text-base text-gray-900"></p>
+            </div>
+            <div class="detail-item">
+                <p class="text-sm font-medium text-gray-500">Phone Number</p>
+                <p id="modal-phone" class="text-base text-gray-900"></p>
+            </div>
+            <div class="detail-item">
+                <p class="text-sm font-medium text-gray-500">Bio</p>
+                <p id="modal-bio" class="text-sm italic text-gray-700"></p>
+            </div>
+        </div>
+
+        <div id="modal-admin-actions" class="flex flex-col space-y-3 pt-4 border-t" style="display: none;">
+            <p class="text-base font-semibold text-gray-700">Current Role: <span id="modal-role" class="text-indigo-600 font-bold"></span></p>
+
+            <button id="promote-button" 
+                class="btn-primary bg-green-500 text-white p-2 rounded hover:bg-green-600 disabled:opacity-50">
+                Promote to Admin
+            </button>
+            <button id="demote-button" 
+                class="btn-secondary bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 disabled:opacity-50">
+                Demote from Admin
+            </button>
+            <button id="kick-button" 
+                class="btn-primary bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:opacity-50">
+                Kick from Group
+            </button>
+        </div>
+
+        <button id="close-modal-button" 
+            class="bg-gray-300 text-gray-800 p-2 rounded mt-6 hover:bg-gray-400 w-full">
+            Close
+        </button>
+    </div>
+</div>
+
+<script src="/js/components/members-component.js"></script>

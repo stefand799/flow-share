@@ -1,0 +1,14 @@
+<script defer src="/js/pages/main-page.js"></script>
+<div class="main-page-layout">
+    <div id="left-column-content" class="profile-section">
+        <%- include('../components/profile-component', { user: user }) %>
+    </div>
+
+    <div class="content-section">
+        <div class="header">
+            <h1 class="welcome-title">Welcome, <%= user.firstName || user.username %>!</h1>
+            <p class="welcome-subtitle">Your central hub for group management and profile access.</p>
+        </div>
+        <%- include('../components/group-list-component', { groups: groups }) %>
+    </div>
+</div>

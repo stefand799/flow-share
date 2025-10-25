@@ -1,0 +1,48 @@
+/* File: public/css/layout.css 
+    Global styles for the application structure.
+*/
+
+/* Apply Inter font family and ensure body/html cover full viewport height */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f9fb; /* Light background */
+}
+
+/* * CRUCIAL FIX: Ensure MAIN wrapper takes up full available height and uses Flexbox for centering.
+* This restores the vertical and horizontal centering for the login/register pages.
+* The main dashboard page will override this by setting its container to 100% width/height.
+*/
+main {
+    display: flex; /* Ensures inner content can be positioned */
+    justify-content: center; /* Horizontal centering for login/register forms */
+    align-items: center; /* Vertical centering for login/register forms */
+    min-height: 100vh; /* Ensure it covers the entire viewport */
+    padding: 2rem 1rem; /* Re-introduce padding for centered pages */
+    flex-direction: column; 
+    width: 100%; /* Ensure it spans the full width */
+}
+
+/* Global styles for footer (tailwinds handles most of this) */
+footer {
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Global button focus styles */
+button:focus, a:focus, input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Tailwind's blue focus ring */
+    transition: box-shadow 0.15s;
+}
+
+/* Example CSS for visual error feedback */
+.error-message {
+    color: #dc2626; /* A strong red color */
+    background-color: #fef2f2; /* Light red background */
+    border: 1px solid #fecaca;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-weight: 500;
+}

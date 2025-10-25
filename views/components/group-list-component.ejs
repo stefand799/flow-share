@@ -1,0 +1,78 @@
+<div class="groups-list-container">
+    <h3 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">My Groups (<%= groups.length %>)</h3>
+
+    <div class="carousel-wrapper"> 
+        
+        <button class="carousel-arrow left-arrow" aria-label="Previous Group">
+            &#10094;
+        </button>
+
+        <div class="group-carousel" id="groupCarousel">
+            
+            <% if (groups && groups.length > 0) { %>
+                <% groups.forEach(group => { %>
+                    <div class="group-card" data-group-id="<%= group.id %>" data-group-name="<%= group.name %>" > 
+                        <h4><%= group.name %></h4> 
+                        <p>Click to view details and tasks</p> 
+                    </div> 
+                <% }); %>
+            <% } else { %>
+                <div class="p-4 text-center text-gray-500">No groups found. Create one!</div>
+            <% } %>
+            <div class="group-card create-card" id="createGroupCard" 
+            > 
+                <span class="text-3xl font-light mb-2">+</span> 
+                <h4>Create New Group</h4> 
+                <p>Click to start a new group</p> 
+            </div>
+
+        </div> 
+        <button class="carousel-arrow right-arrow" aria-label="Next Group">
+            &#10095;
+        </button>
+
+    </div> 
+</div>
+
+<div id="create-group-modal" class="modal hidden">
+    <div> 
+        <h2>Create New Group</h2>
+
+        <form id="create-group-form" action="/api/groups/create" method="POST">
+            <div class="edit-form-content"> 
+                
+                <div class="form-group">
+                    <label for="group-name">Group Name</label>
+                    <input 
+                        type="text" 
+                        id="group-name" 
+                        name="name" 
+                        required
+                        placeholder="e.g., Roommates Expenses"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="group-description">Description (Optional)</label>
+                    <textarea 
+                        id="group-description" 
+                        name="description" 
+                        rows="3"
+                        placeholder="A brief description of the group's purpose"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="cancel-group-create-btn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary">
+                    Create Group
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/components/group-list-component.js"></script>

@@ -1,0 +1,15 @@
+<div class="main-page-layout">
+    <div id="left-column-content" class="profile-section">
+        <%- include('../components/group-component', { group: group, member: member }) %>
+
+        <%- include('../components/members-component', { members: members, groupId: group.id }) %>
+    </div>
+
+    <div class="content-section">
+        <div class="header">
+            <h1 class="welcome-title">Welcome, <%= user.firstName || user.username %>!</h1>
+            <p class="welcome-subtitle">Your central hub for group management and profile access.</p>
+        </div>
+        <%- include('../components/kanban-component', { groups: groups }) %>
+    </div>
+</div>

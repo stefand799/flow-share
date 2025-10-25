@@ -1,0 +1,92 @@
+/* File: public/css/pages/main-page.css */
+
+/* Remove this selector as it restricts the main page content from using full width
+.container.mx-auto.p-6 {
+    max-width: 1200px;
+}
+*/
+
+/* BASE LAYOUT FOR MOBILE (Single Column - 100% width) */
+.main-page-layout {
+    display: grid;
+    /* This ensures the grid container itself takes all available space */
+    width: 100%;
+    /* On small screens, the content stacks in a single column */
+    grid-template-columns: 1fr; 
+    gap: 1.5rem; /* Space between the profile and groups sections */
+    padding: 1.5rem 1rem; /* Add overall padding to the page content */
+    
+    /* ADDED: Ensures the grid container takes up the remaining vertical space 
+       inside the 'main' flex container, effectively pushing 'main' to its edges. */
+    flex-grow: 1; 
+}
+
+/* DESKTOP LAYOUT (25% / 75% Columns) */
+@media (min-width: 1024px) { /* Adjust breakpoint as needed, e.g., 1024px for desktop */
+    .main-page-layout {
+        /* Set two columns: 1 fraction unit (25%) and 3 fraction units (75%) */
+        grid-template-columns: 1fr 3fr; /* This creates the 25%/75% split */
+        gap: 2rem;
+        max-width: 100%;
+        padding: 2rem; /* Consistent desktop padding */
+    }
+}
+
+
+/* Left Column: Profile Container (25% on desktop) */
+.profile-section {
+    padding: 0; /* No need for padding here */
+    height: fit-content;
+    /* On mobile/small screens, the profile takes up 100% of the single column */
+}
+
+/* Right Column: Groups Container (75% on desktop) */
+.content-section {
+    padding: 0; 
+}
+
+
+.header {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb; /* Light separator */
+}
+
+.content-section {
+    padding: 0 1.5rem 0 0; /* Add right padding to the 75% column for content spacing */
+}
+
+/* Base Layout Container */
+.main-page-layout {
+    /* ... (existing styles for grid and gap) ... */
+    width: 100%;
+    /* Remove padding from here as we'll add it to the profile/content sections */
+    padding: 0; 
+}
+
+/* Left Column: Profile Container (25% on desktop) */
+.profile-section {
+    padding: 0 0 0 1.5rem; /* Add left padding to the 25% column */
+    height: fit-content;
+}
+
+/* DESKTOP LAYOUT (25% / 75% Columns) */
+@media (min-width: 1024px) {
+    .main-page-layout {
+        /* Set two columns: 1fr 3fr (25%/75%) */
+        grid-template-columns: 1fr 3fr; 
+        gap: 0; /* Set gap to zero to control spacing with padding on the children */
+        max-width: 100%;
+    }
+    
+    .profile-section {
+        /* Maintain padding */
+        padding: 2rem 1.5rem 2rem 2rem; /* Top Right Bottom Left */
+    }
+
+    .content-section {
+        /* Add padding on the right column */
+        padding: 2rem 2rem 2rem 1.5rem; /* Top Right Bottom Left */
+        height: 100%;
+    }
+}

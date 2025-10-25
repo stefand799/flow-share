@@ -1,0 +1,83 @@
+/* File: public/css/components/members-component.css */
+
+/* Main Container */
+#members-container {
+    /* Inherits styling from Tailwind classes applied in EJS */
+    max-width: 100%; 
+    margin: 0; 
+}
+
+/* Scrollable Member List */
+#member-list {
+    max-height: 400px; /* Define a fixed height for scrolling */
+    overflow-y: auto;
+    /* Optional: Add a subtle scrollbar style if needed */
+}
+
+/* Individual Member List Item */
+.member-list-item {
+    transition: background-color 0.15s ease;
+}
+
+/* Detail items inside the modal, reusing profile styles */
+#member-detail-modal .detail-item {
+    padding: 0.5rem 0; 
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+#member-detail-modal .detail-item p:first-child {
+    font-size: 0.75rem; 
+    color: #9ca3af; /* Lighter label */
+    margin-bottom: 0.15rem; 
+}
+
+#member-detail-modal .detail-item p:nth-child(2) {
+    font-size: 0.95rem; 
+    color: #1f2937;
+}
+
+/* -------------------------------------------
+ * MODAL STYLING (The Popup Backdrop) - Same as profile-component.css
+ * ------------------------------------------- */
+.modal {
+    position: fixed !important; 
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important; 
+    
+    background-color: rgba(247, 249, 251, 0.75) !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+.modal.hidden {
+    display: none !important; 
+    opacity: 0;
+}
+
+/* Modal Content (The White Box Inside) */
+.modal > div {
+    padding: 2.0rem; /* Slightly smaller padding for a narrower modal */
+    display: flex; 
+    flex-direction: column; 
+    gap: 1rem; 
+}
+
+/* Modal Buttons (reusing styles but overriding colors for actions) */
+#member-detail-modal button {
+    padding: 0.75rem 1.25rem; 
+    font-size: 1rem; 
+    border-radius: 0.5rem; 
+    cursor: pointer;
+    font-weight: 600; 
+    transition: background-color 0.2s;
+    border: none;
+}

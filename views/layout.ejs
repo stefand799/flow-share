@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- The pageTitle variable is passed from the server when rendering the layout -->
+    <title><%= pageTitle || 'Auth Application' %></title>
+    <!-- You will link your custom CSS here -->
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/pages/login-page.css">
+    <link rel="stylesheet" href="/css/pages/register-page.css">
+    <link rel="stylesheet" href="/css/pages/main-page.css">
+    <link rel="stylesheet" href="/css/page/group-page.css">
+    <link rel="stylesheet" href="/css/components/profile-component.css">
+    <link rel="stylesheet" href="/css/components/group-list-component.css">
+    <link rel="stylesheet" href="/css/components/group-component.css">
+    <link rel="stylesheet" href="/css/components/members-component.css">
+</head>
+<body>
+
+    <!-- <header>
+        <nav>
+            <a href="/">EJS Auth Demo</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </nav>
+    </header> -->
+
+    <main>
+        <!-- CRITICAL: This is where the content of register-page.ejs or login-page.ejs gets inserted -->
+        <%- body %>
+    </main>
+
+    <!-- <footer>
+        <p>&copy; 2025 My App</p>
+    </footer> -->
+
+</body>
+</html>

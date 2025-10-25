@@ -1,0 +1,108 @@
+<div id="group-container" class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-xl">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">Group Details</h2>
+
+    <div id="group-details" data-group-id="<%= group.id %>" class="space-y-4">
+        
+        <div class="detail-item">
+            <p class="text-sm font-medium text-gray-500">Group name</p>
+            <p class="text-lg font-semibold text-gray-900" id="display-group-name">
+                <%= group.name %>
+            </p>
+        </div>
+
+        <div class="detail-item">
+            <p class="text-sm font-medium text-gray-500">Description</p>
+            <p class="text-base text-gray-700 italic" id="display-description">
+                <%= group.description || 'Describe the purpose of the group.' %>
+            </p>
+        </div>
+        
+        <div class="detail-item">
+            <p class="text-sm font-medium text-gray-500">Whatsapp group link</p>
+            <p class="text-base text-gray-700 italic" id="display-whatsapp-link">
+                <a href="<%= group.whatsappGroupUrl %>" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                    <%= group.whatsappGroupUrl || '[NO LINK PROVIDED]' %>
+                </a>
+            </p>
+        </div>
+        
+        <div class="detail-item">
+            <p class="text-sm font-medium text-gray-500">Created at</p>
+            <p class="text-base text-gray-700 italic">
+                <%= group.createdAt %>
+            </p>
+        </div>            
+    </div>
+    
+    <div class="mt-8 flex justify-between space-x-4">
+        <button id="edit-group-btn"
+            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+            Edit Group
+        </button>
+        <button id="delete-group-btn"
+            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+            Delete Group
+        </button>
+    </div>
+</div>
+
+<div id="edit-modal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-2xl font-bold mb-4 border-b pb-2">Edit Group Details</h3>
+
+        <form id="edit-group-form" action="/api/groups/<%= group.id %>" method="PUT">
+
+            <div class="edit-form-content space-y-4">
+                <div class="form-group">
+                    <label for="edit-name" class="block text-sm font-medium text-gray-700">Group Name</label>
+                    <input type="text" id="edit-name" name="name" value="<%= group.name %>" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="edit-description" name="description" rows="3"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"><%= group.description || '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-whatsappGroupUrl" class="block text-sm font-medium text-gray-700">WhatsApp Link</label>
+                    <input type="url" id="edit-whatsappGroupUrl" name="whatsappGroupUrl" value="<%= group.whatsappGroupUrl || '' %>"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+            </div>
+
+            <div class="button-group flex justify-end space-x-3 mt-6">
+                <button type="button" id="cancel-edit-btn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="delete-modal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <h3 class="text-2xl font-bold text-red-600 mb-3">Permanent Deletion</h3>
+        <p class="text-gray-700 mb-6">
+            <strong class="font-extrabold text-red-700">WARNING:</strong> Deleting this group is permanent and cannot
+            be undone. All associated tasks and expenses will be lost.
+        </p>
+
+        <p class="text-lg font-semibold mb-6">Are you absolutely sure you want to proceed?</p>
+
+        <form id="delete-group-form" action="/api/groups/<%= group.id %>" method="DELETE">
+            <div class="button-group flex justify-end space-x-3">
+                <button type="button" id="cancel-delete-btn" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150">
+                    Yes, Delete Group
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
