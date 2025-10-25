@@ -1,0 +1,138 @@
+/* ============================================
+   GROUP PAGE LAYOUT
+   ============================================ */
+
+.group-page-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile: single column */
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Desktop: 25% / 75% split */
+@media (min-width: 1024px) {
+    .group-page-layout {
+        grid-template-columns: 1fr 3fr; /* 25% / 75% */
+        gap: 2rem;
+        padding: 2rem;
+    }
+}
+
+/* ============================================
+   LEFT COLUMN (25% - Group + Members)
+   ============================================ */
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: fit-content;
+}
+
+@media (min-width: 1024px) {
+    .left-column {
+        height: 100%;
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+}
+
+/* Group Section - Top half */
+.group-section {
+    flex: 0 0 auto;
+    min-height: 300px;
+}
+
+/* Members Section - Bottom half */
+.members-section {
+    flex: 1 1 auto;
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* ============================================
+   RIGHT COLUMN (75% - Toggle + Content)
+   ============================================ */
+
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 500px;
+}
+
+/* ============================================
+   VIEW TOGGLE BUTTONS
+   ============================================ */
+
+.view-toggle {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.toggle-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+.toggle-btn.active {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
+}
+
+.toggle-btn.active:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+/* ============================================
+   CONTENT CONTAINER
+   ============================================ */
+
+.content-container {
+    flex: 1;
+    position: relative;
+    min-height: 500px;
+}
+
+.view-content {
+    width: 100%;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.view-content.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.view-content.active {
+    display: block;
+    opacity: 1;
+}

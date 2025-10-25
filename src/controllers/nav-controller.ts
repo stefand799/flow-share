@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { User, Group } from "../generated/prisma";
 import * as GroupService from "../services/group-service";
-
+import * as TaskService from "../services/task-service";
+import * as ExpenseService from "../services/expense-service";
 // Authenticated request type
 interface AuthenticatedRequest extends Request {
     user?: Omit<User, 'passwordHash'>;
@@ -94,15 +95,68 @@ export const handleGroupView = async (req: AuthenticatedRequest, res: Response) 
         // Fetch group members
         const members = await GroupService.getGroupMembers(groupId);
         
+        // Find current user's member record
+        const currentUserMember = members.find(m => m.userId === req.user!.id);
+        
         // Render just the component (no layout wrapper)
         res.render('components/group-component', {
             group: group,
             members: members,
+            currentUserMember: currentUserMember || null,
             layout: false // Prevents wrapping in main layout
         });
 
     } catch (err) {
         console.error(`Error rendering group view for ID ${groupId}:`, err);
         return res.status(500).send("Server error fetching group data.");
+    }
+};
+
+export const handleGroupPage = async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user) {
+        return res.redirect('/login');
+    }
+
+    const groupId = parseInt(req.params.groupId);
+
+    if (isNaN(groupId)) {
+        return res.status(400).send("Invalid Group ID");
+    }
+
+    try {
+        // Fetch group details
+        const group = await GroupService.getGroupById(groupId);
+        
+        if (!group) {
+            return res.status(404).send("Group not found");
+        }
+
+        // Fetch group members
+        const members = await GroupService.getGroupMembers(groupId);
+        
+        // Find current user's member record
+        const currentUserMember = members.find(m => m.userId === req.user!.id);
+        
+        if (!currentUserMember) {
+            return res.status(403).send("You are not a member of this group");
+        }
+
+        // Fetch tasks and expenses (you'll need these services)
+        // const tasks = await TaskService.getAllTasks(groupId);
+        // const expenses = await ExpenseService.getAllExpenses(groupId);
+        
+        res.render('pages/group-page', {
+            pageTitle: group.name,
+            user: req.user,
+            group: group,
+            members: members,
+            currentUserMember: currentUserMember,
+            // tasks: tasks,
+            // expenses: expenses,
+        });
+
+    } catch (err) {
+        console.error('Error loading group page:', err);
+        return res.status(500).send("Server error");
     }
 };

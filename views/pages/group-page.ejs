@@ -1,15 +1,61 @@
-<div class="main-page-layout">
-    <div id="left-column-content" class="profile-section">
-        <%- include('../components/group-component', { group: group, member: member }) %>
+<script defer src="/js/pages/group-page.js"></script>
 
-        <%- include('../components/members-component', { members: members, groupId: group.id }) %>
+<div class="group-page-layout">
+    <!-- LEFT COLUMN: 25% width -->
+    <div class="left-column">
+        
+        <!-- Group Component (Top half of left column) -->
+        <div class="group-section">
+            <%- include('../components/group-component', { 
+                group: group, 
+                currentUserMember: currentUserMember 
+            }) %>
+        </div>
+
+        <!-- Members Component (Bottom half of left column) -->
+        <div class="members-section">
+            <%- include('../components/members-component', { 
+                members: members, 
+                groupId: group.id,
+                currentUserMember: currentUserMember
+            }) %>
+        </div>
     </div>
 
-    <div class="content-section">
-        <div class="header">
-            <h1 class="welcome-title">Welcome, <%= user.firstName || user.username %>!</h1>
-            <p class="welcome-subtitle">Your central hub for group management and profile access.</p>
+    <!-- RIGHT COLUMN: 75% width -->
+    <div class="right-column">
+        
+        <!-- View Toggle Buttons -->
+        <div class="view-toggle">
+            <button id="kanban-view-btn" class="toggle-btn active">
+                📋 Kanban Board
+            </button>
+            <button id="expenses-view-btn" class="toggle-btn">
+                💰 Expenses
+            </button>
         </div>
-        <%- include('../components/kanban-component', { groups: groups }) %>
+
+        <!-- Content Container (switches between kanban and expenses) -->
+        <div id="content-container" class="content-container">
+            
+            <!-- Kanban Component (Shown by default) -->
+            <div id="kanban-view" class="view-content active">
+                <%- include('../components/kanban-component', { 
+                    group: group,
+                    tasks: tasks,
+                    currentUserMember: currentUserMember
+                }) %>
+            </div>
+
+            <!-- Expenses Component (Hidden by default) -->
+            <div id="expenses-view" class="view-content hidden">
+                <%- include('../components/expenses-component', { 
+                    group: group,
+                    expenses: expenses,
+                    currentUserMember: currentUserMember
+                }) %>
+            </div>
+
+        </div>
     </div>
 </div>

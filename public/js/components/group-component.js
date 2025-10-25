@@ -1,42 +1,90 @@
 // File: public/js/components/group-component.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Get Modal and Button Elements
+    
+    // ============================================
+    // GET MODAL AND BUTTON ELEMENTS
+    // ============================================
+    
+    const addMemberModal = document.getElementById('add-member-modal');
     const editModal = document.getElementById('edit-modal');
     const deleteModal = document.getElementById('delete-modal');
+    
+    const addMemberBtn = document.getElementById('add-member-btn');
     const editBtn = document.getElementById('edit-group-btn');
     const deleteBtn = document.getElementById('delete-group-btn');
+    
+    const cancelAddMemberBtn = document.getElementById('cancel-add-member-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    
+    const addMemberForm = document.getElementById('add-member-form');
     const editForm = document.getElementById('edit-group-form');
     const deleteForm = document.getElementById('delete-group-form');
-    const groupId = document.getElementById('group-details')?.dataset.groupId; // Get group ID from EJS data attribute
 
-    // --- Modal Control Functions ---
+    // ============================================
+    // MODAL CONTROL FUNCTIONS
+    // ============================================
+    
     const openModal = (modal) => {
-        if (modal) modal.classList.remove('hidden');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
     };
 
     const closeModal = (modal) => {
-        if (modal) modal.classList.add('hidden');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     };
 
-    // 2. Event Listeners for Opening Modals
-    if (editBtn) editBtn.addEventListener('click', () => openModal(editModal));
-    if (deleteBtn) deleteBtn.addEventListener('click', () => openModal(deleteModal));
+    // ============================================
+    // OPEN MODAL EVENT LISTENERS
+    // ============================================
     
-    // 3. Event Listeners for Closing Modals (Cancel Buttons)
-    if (cancelEditBtn) cancelEditBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal(editModal);
-    });
+    if (addMemberBtn) {
+        addMemberBtn.addEventListener('click', () => openModal(addMemberModal));
+    }
+    
+    if (editBtn) {
+        editBtn.addEventListener('click', () => openModal(editModal));
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => openModal(deleteModal));
+    }
 
-    if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal(deleteModal);
-    });
+    // ============================================
+    // CLOSE MODAL EVENT LISTENERS
+    // ============================================
+    
+    if (cancelAddMemberBtn) {
+        cancelAddMemberBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(addMemberModal);
+        });
+    }
 
-    // 4. Close Modals on Backdrop Click
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(editModal);
+        });
+    }
+
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal(deleteModal);
+        });
+    }
+
+    // ============================================
+    // CLOSE MODALS ON BACKDROP CLICK
+    // ============================================
+    
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -45,70 +93,98 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 5. Form Submission Logic (using Fetch for PUT/DELETE) ---
+    // ============================================
+    // ADD MEMBER FORM SUBMISSION
+    // ============================================
+    
+    if (addMemberForm) {
+        addMemberForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(addMemberForm);
+            const data = Object.fromEntries(formData);
 
-    // === EDIT FORM (PUT Request) ===
-    if (editForm && groupId) {
-        // The EJS template sets the action="/api/groups/<%= group.id %>"
+            try {
+                const response = await fetch('/api/groups/add-member', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert('Member added successfully!');
+                    closeModal(addMemberModal);
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message || 'Failed to add member'}`);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                alert('An unexpected error occurred.');
+            }
+        });
+    }
+
+    // ============================================
+    // EDIT GROUP FORM SUBMISSION
+    // ============================================
+    
+    if (editForm) {
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Collect form data and encode it for x-www-form-urlencoded format
-            // NOTE: URLSearchParams automatically includes the input fields (name, description, whatsappGroupUrl)
-            const formData = new URLSearchParams(new FormData(editForm)).toString();
-            // Use the base URL defined in the EJS action (e.g., /api/groups/123)
-            const actionUrl = editForm.action; 
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData);
+            const actionUrl = editForm.action;
 
             try {
                 const response = await fetch(actionUrl, {
-                    method: 'PUT', // Use PUT method for update
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: formData,
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
                 });
 
                 if (response.ok) {
                     alert('Group updated successfully!');
                     closeModal(editModal);
-                    // Reload the page to display the new data
-                    window.location.reload(); 
+                    window.location.reload();
                 } else {
                     const errorData = await response.json();
                     alert(`Update failed: ${errorData.message || 'Server error'}`);
                 }
             } catch (error) {
-                console.error('Network error during group update:', error);
-                alert('An unexpected error occurred during group update.');
+                console.error('Network error:', error);
+                alert('An unexpected error occurred.');
             }
         });
     }
 
-
-    // === DELETE FORM (DELETE Request) ===
-    if (deleteForm && groupId) {
-        // The EJS template sets the action="/api/groups/<%= group.id %>"
+    // ============================================
+    // DELETE GROUP FORM SUBMISSION
+    // ============================================
+    
+    if (deleteForm) {
         deleteForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const actionUrl = deleteForm.action; 
-            
+            const actionUrl = deleteForm.action;
+
             try {
                 const response = await fetch(actionUrl, {
-                    method: 'DELETE', // Use DELETE method
+                    method: 'DELETE',
                 });
 
                 if (response.ok) {
                     alert('Group deleted successfully!');
-                    // Redirect to the dashboard/groups list after deletion
-                    window.location.href = '/dashboard'; 
+                    window.location.href = '/dashboard';
                 } else {
                     const errorData = await response.json();
                     alert(`Deletion failed: ${errorData.message || 'Server error'}`);
                 }
             } catch (error) {
-                console.error('Network error during group deletion:', error);
-                alert('An unexpected error occurred during group deletion.');
+                console.error('Network error:', error);
+                alert('An unexpected error occurred.');
             }
         });
     }

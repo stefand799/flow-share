@@ -23,7 +23,7 @@ router.get("/dashboard", authenticate, NavController.handleDashboard);
 
 // View specific group (partial render for dynamic content)
 router.get("/groups/:groupId", authenticate, NavController.handleGroupView);
-
+router.get("/component/group/:groupId", authenticate, NavController.handleGroupView);
 // ============================================
 // REDIRECTS
 // ============================================
