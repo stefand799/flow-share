@@ -1,22 +1,16 @@
-/* File: public/js/pages/register-page.js 
-    Reserved for client-side validation for registration.
-*/
-
+// Optional: Client-side password validation
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.querySelector('form[action="/auth/register"]');
     
-    // Example: Client-side password length check
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => {
-            const passwordField = document.getElementById('password');
-            if (passwordField.value.length < 8) {
-                // To implement client-side validation, uncomment the next line 
-                // and add a UI error message display instead of using console/alert.
-                // e.preventDefault(); 
-                console.error("Password must be at least 8 characters.");
-            }
+            const password = document.getElementById('password').value;
             
-            // Example: Email format validation could also be done here
+            // Password length check
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long');
+            }
         });
     }
 });

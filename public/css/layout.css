@@ -1,48 +1,42 @@
-/* File: public/css/layout.css 
-    Global styles for the application structure.
-*/
-
-/* Apply Inter font family and ensure body/html cover full viewport height */
+/* Global styles */
 html, body {
     height: 100%;
     margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: #f7f9fb; /* Light background */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f7f9fb;
 }
 
-/* * CRUCIAL FIX: Ensure MAIN wrapper takes up full available height and uses Flexbox for centering.
-* This restores the vertical and horizontal centering for the login/register pages.
-* The main dashboard page will override this by setting its container to 100% width/height.
-*/
+/* Center auth pages (login/register) */
 main {
-    display: flex; /* Ensures inner content can be positioned */
-    justify-content: center; /* Horizontal centering for login/register forms */
-    align-items: center; /* Vertical centering for login/register forms */
-    min-height: 100vh; /* Ensure it covers the entire viewport */
-    padding: 2rem 1rem; /* Re-introduce padding for centered pages */
-    flex-direction: column; 
-    width: 100%; /* Ensure it spans the full width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
 }
 
-/* Global styles for footer (tailwinds handles most of this) */
-footer {
-    border-top: 1px solid #e5e7eb;
-}
-
-/* Global button focus styles */
-button:focus, a:focus, input:focus {
+/* Global focus styles */
+*:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Tailwind's blue focus ring */
-    transition: box-shadow 0.15s;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
-/* Example CSS for visual error feedback */
+/* Error message styling */
 .error-message {
-    color: #dc2626; /* A strong red color */
-    background-color: #fef2f2; /* Light red background */
+    background-color: #fee2e2;
     border: 1px solid #fecaca;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    font-weight: 500;
+    color: #b91c1c;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.error-message p:first-child {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.error-message p:last-child {
+    margin: 0;
 }

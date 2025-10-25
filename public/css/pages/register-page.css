@@ -1,10 +1,4 @@
-/* File: public/css/pages/register-page.css 
-    Styles specific to the registration page.
-    It primarily inherits the styling from login-page.css by using the same class names.
-*/
-
-/* Ensures the container class is applied to the main div */
-.register-page-container > div {
-    /* We'll use the same styles as the login form for consistency */
-    max-width: 450px; /* Slightly wider form for more fields */
+/* Register form is slightly wider */
+.register-page-container {
+    max-width: 450px;
 }

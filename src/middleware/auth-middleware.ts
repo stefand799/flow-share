@@ -1,40 +1,48 @@
 import { Request, Response, NextFunction } from "express";
-import {User} from "../generated/prisma";
-import jwt from "jsonwebtoken";
+import { User } from "../generated/prisma";
+import { verifyToken } from "../utils/auth";
 import { findUserById } from "../services/user-service";
-
-const JWT_SECRET = process.env.JWT_SECRET || "super_secret"
 
 type SafeUser = Omit<User, 'passwordHash'>;
 
-interface AuthenticateRequest extends Request{
+export interface AuthenticatedRequest extends Request {
     user?: SafeUser;
 }
 
-export const authenticate = async (req: AuthenticateRequest, res: Response, next: NextFunction) => {
+// Middleware to verify JWT and attach user to request
+export const authenticate = async (
+    req: AuthenticatedRequest, 
+    res: Response, 
+    next: NextFunction
+) => {
     const token = req.cookies.token;
 
-    if(!token){
-        // FIX: Redirect to the root-relative path for the login page: /login
-        return res.redirect("/login"); 
+    // No token - redirect to login
+    if (!token) {
+        return res.redirect("/login");
     }
 
-    try{
-        const decoded = jwt.verify(token, JWT_SECRET) as {id: number};
-        const user = await findUserById(decoded.id);
-
-        if(!user){
+    try {
+        // Verify token
+        const decoded = verifyToken(token);
+        if (!decoded) {
             res.clearCookie('token');
-            // FIX: Redirect to the root-relative path for the login page: /login
             return res.redirect("/login");
         }
 
+        // Get user from database
+        const user = await findUserById(decoded.id);
+        if (!user) {
+            res.clearCookie('token');
+            return res.redirect("/login");
+        }
+
+        // Attach user to request and continue
         req.user = user;
         next();
-    } catch(err){
-        console.error("JWT Verification failed:", err); // Add logging
+    } catch (err) {
+        console.error("Authentication failed:", err);
         res.clearCookie("token");
-        // FIX: Redirect to the root-relative path for the login page: /login
         return res.redirect("/login");
     }
 };

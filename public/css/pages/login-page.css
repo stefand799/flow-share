@@ -1,10 +1,7 @@
-/* File: public/css/pages/login-page.css 
-    Specific styles for the login form container.
-*/
+/* Shared auth container (used by both login and register) */
 .auth-container {
     max-width: 400px;
     width: 90%;
-    margin: 2rem auto;
     background: #ffffff;
     padding: 2.5rem;
     border-radius: 12px;
@@ -12,78 +9,78 @@
 }
 
 .auth-container h2 {
-    font-size: 1.875rem; /* 3xl */
+    font-size: 1.875rem;
     font-weight: 700;
-    color: #1f2937; /* Gray 800 */
+    color: #1f2937;
     margin-bottom: 1.5rem;
     text-align: center;
 }
 
+/* Form layout */
 .auth-container form > div {
     margin-bottom: 1rem;
 }
 
 .auth-container label {
     display: block;
-    font-size: 0.875rem; /* sm */
+    font-size: 0.875rem;
     font-weight: 500;
-    color: #4b5563; /* Gray 600 */
-    margin-bottom: 0.3rem;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
 }
 
 .auth-container input {
-    box-sizing: border-box; 
     width: 100%;
     padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
     border-radius: 8px;
     font-size: 1rem;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
 .auth-container input:focus {
-    border-color: #3b82f6; /* Blue 500 */
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* Submit button */
 .auth-container button[type="submit"] {
     width: 100%;
     padding: 0.75rem;
-    background-color: #2563eb; /* Blue 600 */
+    background-color: #2563eb;
     color: white;
     font-weight: 600;
+    border: none;
     border-radius: 8px;
     margin-top: 1.5rem;
     cursor: pointer;
-    transition: background-color 0.15s;
+    transition: background-color 0.2s;
+    font-size: 1rem;
 }
 
 .auth-container button[type="submit"]:hover {
-    background-color: #1d4ed8; /* Blue 700 */
+    background-color: #1d4ed8;
 }
 
+.auth-container button[type="submit"]:active {
+    background-color: #1e40af;
+}
+
+/* Footer link */
 .auth-container p {
     text-align: center;
     margin-top: 1.5rem;
     font-size: 0.875rem;
-    color: #6b7280; /* Gray 500 */
+    color: #6b7280;
 }
 
 .auth-container a {
-    color: #3b82f6; /* Blue 500 */
+    color: #3b82f6;
     text-decoration: none;
     font-weight: 600;
 }
-/* Error messages */
-.error-message {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #f87171; /* Red 400 */
-    background-color: #fee2e2; /* Red 100 */
-    color: #b91c1c; /* Red 700 */
-    border-radius: 8px;
-    font-size: 0.875rem;
-}
-.error-message p:first-child {
-    font-weight: bold;
-    margin-bottom: 0.25rem;
+
+.auth-container a:hover {
+    text-decoration: underline;
 }

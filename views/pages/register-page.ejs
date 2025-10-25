@@ -1,58 +1,57 @@
-<script defer src="/js/pages/register-page.js"></script>
-
 <div class="auth-container register-page-container">
-    <div>
-        <h2>Create Account</h2>
+    <h2>Create Account</h2>
 
-        <% if (typeof error !== 'undefined' && error) { %>
-            <div class="error-message">
-                <p>Error!</p>
-                <p><%= error %></p>
-            </div>
-        <% } %>
+    <!-- Error Display (shown when registration fails) -->
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-message">
+            <p><strong>Registration Failed!</strong></p>
+            <p><%= error %></p>
+        </div>
+    <% } %>
 
-        <form action="/auth/register" method="POST">
-            <div>
-                <label for="username">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    required 
-                    placeholder="Enter a unique username"
-                >
-            </div>
+    <!-- Registration Form -->
+    <form action="/auth/register" method="POST">
+        <div>
+            <label for="username">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                placeholder="Enter a unique username"
+            >
+        </div>
 
-            <div>
-                <label for="emailAddress">Email Address</label>
-                <input 
-                    type="email" 
-                    id="emailAddress" 
-                    name="emailAddress"
-                    required 
-                    placeholder="you@example.com"
-                >
-            </div>
+        <div>
+            <label for="emailAddress">Email Address</label>
+            <input 
+                type="email" 
+                id="emailAddress" 
+                name="emailAddress"
+                required 
+                placeholder="you@example.com"
+            >
+        </div>
 
-            <div>
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required
-                    placeholder="Minimum 8 characters"
-                > 
-            </div>
+        <div>
+            <label for="password">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                required
+                minlength="8"
+                placeholder="Minimum 8 characters"
+            > 
+        </div>
 
-            <button type="submit">
-                Register
-            </button>
-        </form>
+        <button type="submit">Register</button>
+    </form>
 
-        <p>
-            Already have an account?
-            <a href="/login">Log in here</a>
-        </p>
-    </div>
+    <p>
+        Already have an account?
+        <a href="/login">Log in here</a>
+    </p>
 </div>
+
+<script defer src="/js/pages/register-page.js"></script>
