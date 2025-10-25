@@ -1,95 +1,119 @@
 <script src="/js/components/profile-component.js"></script>
-<div id="user-profile-container" class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-xl">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">User Profile</h2>
+
+<div id="user-profile-container" class="profile-card">
+    <h2 class="profile-title">User Profile</h2>
 
     <!-- User Details Display -->
-    <div id="profile-details" data-user-id="<%= user.id %>" class="space-y-4">
+    <div id="profile-details" data-user-id="<%= user.id %>" class="profile-details">
 
         <div class="detail-item">
-            <p class="text-sm font-medium text-gray-500">Username</p>
-            <p class="text-lg font-semibold text-gray-900" id="display-username">
-                <%= user.username %>
+            <p class="detail-label">Username</p>
+            <p class="detail-value" id="display-username"><%= user.username %></p>
+        </div>
+
+        <div class="detail-item">
+            <p class="detail-label">Full Name</p>
+            <p class="detail-value" id="display-name">
+                <%= user.firstName || 'N/A' %> <%= user.lastName || '' %>
             </p>
         </div>
 
         <div class="detail-item">
-            <p class="text-sm font-medium text-gray-500">Full Name</p>
-            <p class="text-lg text-gray-700" id="display-name">
-                <%= user.firstName || 'N/A' %>
-                    <%= user.lastName || '' %>
-            </p>
+            <p class="detail-label">Email Address</p>
+            <p class="detail-value" id="display-email"><%= user.emailAddress %></p>
         </div>
 
         <div class="detail-item">
-            <p class="text-sm font-medium text-gray-500">Email Address</p>
-            <p class="text-lg text-gray-700" id="display-email">
-                <%= user.emailAddress %>
-            </p>
+            <p class="detail-label">Phone Number</p>
+            <p class="detail-value" id="display-phone"><%= user.phoneNumber || 'N/A' %></p>
         </div>
 
         <div class="detail-item">
-            <p class="text-sm font-medium text-gray-500">Phone Number</p>
-            <p class="text-lg text-gray-700" id="display-phone">
-                <%= user.phoneNumber || 'N/A' %>
-            </p>
-        </div>
-
-        <div class="detail-item">
-            <p class="text-sm font-medium text-gray-500">Bio</p>
-            <p class="text-base text-gray-700 italic" id="display-bio">
+            <p class="detail-label">Bio</p>
+            <p class="detail-value detail-bio" id="display-bio">
                 <%= user.bio || 'Tell us a bit about yourself.' %>
             </p>
         </div>
     </div>
 
     <!-- Action Buttons -->
-    <div class="mt-8 flex justify-between space-x-4">
-        <button id="edit-profile-btn"
-            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+    <div class="profile-actions">
+        <button id="edit-profile-btn" class="btn-primary">
             Edit Profile
         </button>
-        <button id="logout-btn"
-            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+        <button id="logout-btn" class="btn-danger">
             Logout
         </button>
-        <button id="delete-account-btn"
-            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition duration-150">
+        <button id="delete-account-btn" class="btn-danger">
             Delete Account
         </button>
     </div>
 </div>
 
+<!-- ============================================
+     EDIT PROFILE MODAL
+     ============================================ -->
 <div id="edit-modal" class="modal hidden">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-        <h3 class="text-2xl font-bold mb-4 border-b pb-2">Edit Your Profile</h3>
+    <div class="modal-content">
+        <h3 class="modal-title">Edit Your Profile</h3>
 
         <form id="edit-profile-form" action="/api/users/<%= user.id %>" method="PUT">
-
-            <div class="edit-form-content">
+            <div class="form-content">
+                
                 <div class="form-group">
                     <label for="edit-username">Username</label>
-                    <input type="text" id="edit-username" name="username" value="<%= user.username %>" required
-                        readonly>
+                    <input 
+                        type="text" 
+                        id="edit-username" 
+                        name="username" 
+                        value="<%= user.username %>" 
+                        readonly
+                        disabled
+                    >
+                    <small style="color: #6b7280; font-size: 0.75rem;">Username cannot be changed</small>
                 </div>
 
                 <div class="form-group">
                     <label for="edit-firstName">First Name</label>
-                    <input type="text" id="edit-firstName" name="firstName" value="<%= user.firstName || '' %>">
+                    <input 
+                        type="text" 
+                        id="edit-firstName" 
+                        name="firstName" 
+                        value="<%= user.firstName || '' %>"
+                        placeholder="Enter your first name"
+                    >
                 </div>
 
                 <div class="form-group">
                     <label for="edit-lastName">Last Name</label>
-                    <input type="text" id="edit-lastName" name="lastName" value="<%= user.lastName || '' %>">
-                </div>
-
-                <div class="form-group">
-                    <label for="edit-bio">Bio</label>
-                    <textarea id="edit-bio" name="bio" rows="3"><%= user.bio || '' %></textarea>
+                    <input 
+                        type="text" 
+                        id="edit-lastName" 
+                        name="lastName" 
+                        value="<%= user.lastName || '' %>"
+                        placeholder="Enter your last name"
+                    >
                 </div>
 
                 <div class="form-group">
                     <label for="edit-phoneNumber">Phone Number</label>
-                    <input type="tel" id="edit-phoneNumber" name="phoneNumber" value="<%= user.phoneNumber || '' %>">
+                    <input 
+                        type="tel" 
+                        id="edit-phoneNumber" 
+                        name="phoneNumber" 
+                        value="<%= user.phoneNumber || '' %>"
+                        placeholder="e.g., +1234567890"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-bio">Bio</label>
+                    <textarea 
+                        id="edit-bio" 
+                        name="bio" 
+                        rows="4"
+                        placeholder="Tell us a bit about yourself..."
+                    ><%= user.bio || '' %></textarea>
                 </div>
             </div>
 
@@ -105,38 +129,51 @@
     </div>
 </div>
 
+<!-- ============================================
+     LOGOUT CONFIRMATION MODAL
+     ============================================ -->
 <div id="logout-modal" class="modal hidden">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
-        <h3 class="text-2xl font-bold text-red-600 mb-3">Logging out</h3>
-        <p class="text-lg font-semibold mb-6">Are you sure you want to proceed?</p>
+    <div class="modal-content modal-small">
+        <h3 class="modal-title modal-title-danger">Confirm Logout</h3>
+        
+        <p class="modal-message">
+            Are you sure you want to log out?
+        </p>
 
-        <form id="logout-profile-form" action="/auth/logout" method="POST"> <div class="button-group">
+        <form id="logout-profile-form" action="/auth/logout" method="POST">
+            <div class="button-group">
                 <button type="button" id="cancel-logout-btn" class="btn-secondary">
                     Cancel
                 </button>
-                <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700">
-                    Yes, Log Me Out </button>
+                <button type="submit" class="btn-danger">
+                    Yes, Log Out
+                </button>
             </div>
         </form>
     </div>
 </div>
 
+<!-- ============================================
+     DELETE ACCOUNT CONFIRMATION MODAL
+     ============================================ -->
 <div id="delete-modal" class="modal hidden">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
-        <h3 class="text-2xl font-bold text-red-600 mb-3">Permanent Deletion</h3>
-        <p class="text-gray-700 mb-6">
-            <strong class="font-extrabold text-red-700">WARNING:</strong> Deleting your account is permanent and cannot
-            be undone. All associated data will be lost.
+    <div class="modal-content modal-small">
+        <h3 class="modal-title modal-title-danger">⚠️ Permanent Deletion</h3>
+        
+        <p class="modal-message">
+            <strong style="color: #dc2626;">WARNING:</strong> Deleting your account is permanent and cannot be undone. All your data, groups, and contributions will be lost forever.
         </p>
 
-        <p class="text-lg font-semibold mb-6">Are you absolutely sure you want to proceed?</p>
+        <p class="modal-message" style="margin-top: 1rem;">
+            Are you absolutely sure?
+        </p>
 
         <form id="delete-profile-form" action="/api/users/<%= user.id %>" method="DELETE">
             <div class="button-group">
                 <button type="button" id="cancel-delete-btn" class="btn-secondary">
                     Cancel
                 </button>
-                <button type="submit" class="btn-primary bg-red-600 hover:bg-red-700">
+                <button type="submit" class="btn-danger">
                     Yes, Delete My Account
                 </button>
             </div>

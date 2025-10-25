@@ -1,32 +1,42 @@
 <div class="groups-list-container">
-    <h3 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">My Groups (<%= groups.length %>)</h3>
+    <h3 class="groups-header">My Groups (<%= groups.length %>)</h3>
 
     <div class="carousel-wrapper"> 
         
+        <!-- Left Arrow -->
         <button class="carousel-arrow left-arrow" aria-label="Previous Group">
             &#10094;
         </button>
 
+        <!-- Carousel Container -->
         <div class="group-carousel" id="groupCarousel">
             
+            <!-- User's Group Cards -->
             <% if (groups && groups.length > 0) { %>
                 <% groups.forEach(group => { %>
-                    <div class="group-card" data-group-id="<%= group.id %>" data-group-name="<%= group.name %>" > 
-                        <h4><%= group.name %></h4> 
-                        <p>Click to view details and tasks</p> 
+                    <div class="group-card" 
+                         data-group-id="<%= group.id %>" 
+                         data-group-name="<%= group.name %>"> 
+                        <h4 class="group-card-title"><%= group.name %></h4> 
+                        <p class="group-card-text">Click to view details and tasks</p> 
                     </div> 
                 <% }); %>
             <% } else { %>
-                <div class="p-4 text-center text-gray-500">No groups found. Create one!</div>
+                <div class="no-groups-message">
+                    No groups found. Create one to get started!
+                </div>
             <% } %>
-            <div class="group-card create-card" id="createGroupCard" 
-            > 
-                <span class="text-3xl font-light mb-2">+</span> 
-                <h4>Create New Group</h4> 
-                <p>Click to start a new group</p> 
+            
+            <!-- Create New Group Card -->
+            <div class="group-card create-card" id="createGroupCard"> 
+                <span class="create-icon">+</span> 
+                <h4 class="group-card-title">Create New Group</h4> 
+                <p class="group-card-text">Click to start a new group</p> 
             </div>
 
-        </div> 
+        </div>
+        
+        <!-- Right Arrow -->
         <button class="carousel-arrow right-arrow" aria-label="Next Group">
             &#10095;
         </button>
@@ -34,12 +44,13 @@
     </div> 
 </div>
 
+<!-- Create Group Modal -->
 <div id="create-group-modal" class="modal hidden">
-    <div> 
-        <h2>Create New Group</h2>
+    <div class="modal-content"> 
+        <h2 class="modal-title">Create New Group</h2>
 
         <form id="create-group-form" action="/api/groups/create" method="POST">
-            <div class="edit-form-content"> 
+            <div class="form-content"> 
                 
                 <div class="form-group">
                     <label for="group-name">Group Name</label>

@@ -1,14 +1,20 @@
 <script defer src="/js/pages/main-page.js"></script>
+
 <div class="main-page-layout">
+    <!-- LEFT SECTION: 25% width - Profile Component -->
     <div id="left-column-content" class="profile-section">
         <%- include('../components/profile-component', { user: user }) %>
     </div>
 
+    <!-- RIGHT SECTION: 75% width - Welcome Header + Group List -->
     <div class="content-section">
+        <!-- Welcome Header -->
         <div class="header">
             <h1 class="welcome-title">Welcome, <%= user.firstName || user.username %>!</h1>
             <p class="welcome-subtitle">Your central hub for group management and profile access.</p>
         </div>
+
+        <!-- Group List Carousel -->
         <%- include('../components/group-list-component', { groups: groups }) %>
     </div>
 </div>
