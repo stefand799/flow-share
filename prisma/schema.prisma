@@ -1,0 +1,179 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url = env("DATABASE_URL")
+}
+
+// =========================================================
+// ENUMS (Used for defined value sets)
+// =========================================================
+
+enum RecurrenceInterval {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum Currency {
+  EUR
+  USD
+  RON
+}
+
+enum Stage {
+  TO_DO
+  IN_PROGRESS
+  DONE
+}
+
+// =========================================================
+// MODELS (Tables)
+// =========================================================
+
+model User {
+  // Primary Key and Unique Identifiers
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  emailAddress String    @unique
+  phoneNumber  String?
+
+  // Credentials and Security
+  passwordHash String    @map("password_hash")
+
+  // Basic Info
+  firstName    String?    @map("first_name")
+  lastName     String?    @map("last_name")
+  bio          String?
+  isVerified   Boolean   @default(false) @map("is_verified")
+
+  // Relationships
+  GroupMembers GroupMember[]
+
+  // Auditing
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Group {
+  // Primary Key
+  id           Int           @id @default(autoincrement())
+
+  // Group Info
+  name              String
+  description       String?
+  whatsappGroupUrl  String?
+
+  // Relationships
+  Members      GroupMember[]
+  Tasks        Task[]
+  Expenses     Expense[]
+
+  // Auditing
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@map("groups")
+}
+
+model GroupMember {
+  // Primary Key
+  id             Int             @id @default(autoincrement())
+
+  // Membership Details
+  isAdmin        Boolean         @default(false) @map("is_admin")
+
+  // Relationships
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int             @map("user_id")
+
+  group          Group           @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId        Int             @map("group_id")
+
+  Tasks          Task[]
+  Contributions  Contribution[]
+
+  // Ensures a user is only listed once per group
+  @@unique([userId, groupId])
+
+  // Auditing
+  createdAt      DateTime        @default(now()) @map("created_at")
+
+  @@map("group_members")
+}
+
+model Task {
+  // Primary Key
+  id             Int           @id @default(autoincrement())
+
+  // Task Details
+  name           String
+  description    String?
+  stage          Stage         @default(TO_DO)
+  due            DateTime?     @map("due_date")
+
+  // Relationships
+  group          Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId        Int           @map("group_id")
+
+  assignedTo     GroupMember?   @relation(fields: [groupMemberId], references: [id])
+  groupMemberId  Int?           @map("group_member_id")
+
+  // Auditing
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@map("tasks")
+}
+
+model Expense {
+  // Primary Key
+  id                   Int                   @id @default(autoincrement())
+
+  // Expense Details
+  title                String
+  description          String?
+  value                Float
+  currency             Currency              @default(USD)
+  isRecurring          Boolean               @default(false) @map("is_recurring")
+  due                  DateTime?             @map("due_date")
+  recurrenceInterval   RecurrenceInterval?   @map("recurrence_interval")
+
+  // Relationships
+  group                Group                 @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId              Int                   @map("group_id")
+
+  Contributions        Contribution[]
+
+  // Auditing
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+
+  @@map("expenses")
+}
+
+model Contribution {
+  // Primary Key
+  id             Int         @id @default(autoincrement())
+
+  // Contribution Details
+  value          Float
+
+  // Relationships
+  expense        Expense     @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId      Int         @map("expense_id")
+
+  member         GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Cascade)
+  groupMemberId  Int         @map("group_member_id")
+
+  // Auditing
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  @@map("contributions")
+}
