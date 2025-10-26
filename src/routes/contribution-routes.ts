@@ -4,9 +4,18 @@ import { authenticate } from "../middleware/auth-middleware";
 
 const router = Router();
 
-router.post("/create", authenticate, ContributionController.handleCreate);
-router.put("/update", authenticate, ContributionController.handleUpdate);
-router.delete("/delete", authenticate, ContributionController.handleDelete);
-router.get("/get-all", authenticate, ContributionController.handleGetAll);
+// RESTful Contribution Routes
+
+// POST /api/contributions - Create a new contribution
+router.post("/", authenticate, ContributionController.handleCreate);
+
+// GET /api/contributions/expense/:expenseId - Get all contributions for an expense
+router.get("/expense/:expenseId", authenticate, ContributionController.handleGetAll);
+
+// PUT /api/contributions/:contributionId - Update a contribution
+router.put("/:contributionId", authenticate, ContributionController.handleUpdate);
+
+// DELETE /api/contributions/:contributionId - Delete a contribution
+router.delete("/:contributionId", authenticate, ContributionController.handleDelete);
 
 export default router;
