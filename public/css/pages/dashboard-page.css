@@ -1,130 +1,216 @@
 /* ============================================
-   GROUP PAGE LAYOUT
-   ============================================ */
+   DASHBOARD-PAGE.CSS - Dashboard Page Styles
+   ============================================
+   
+   This file contains styles for:
+   - Dashboard page layout (25/75 split)
+   - Page header with back button
+   - View toggle buttons
+   - Left/right column layout
+   - Responsive design
+   
+   Components have their own CSS files
+============================================ */
 
-.group-page-layout {
-    display: grid;
-    grid-template-columns: 1fr; /* Mobile: single column */
-    gap: 1.5rem;
-    padding: 1.5rem 1rem;
-    min-height: 100vh;
-    width: 100%;
+/* ============================================
+   DASHBOARD PAGE CONTAINER
+============================================ */
+
+.dashboard-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
 }
 
-/* Desktop: 25% / 75% split */
+/* ============================================
+   PAGE HEADER
+============================================ */
+
+.page-header {
+    padding: 1.5rem 2rem 1rem;
+    margin-bottom: 2rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-back {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.btn-back:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    transform: translateX(-4px);
+}
+
+.header-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.25rem 0;
+}
+
+.header-title .subtitle {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0;
+}
+
+/* ============================================
+   DASHBOARD LAYOUT (25% / 75% SPLIT)
+============================================ */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile: single column */
+    gap: 2rem;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
 @media (min-width: 1024px) {
-    .group-page-layout {
-        grid-template-columns: 1fr 3fr; /* 25% / 75% */
-        gap: 2rem;
-        padding: 2rem;
+    .dashboard-layout {
+        grid-template-columns: 1fr 3fr; /* Desktop: 25% / 75% */
+        gap: 2.5rem;
+        padding: 0 2rem;
     }
 }
 
 /* ============================================
-   LEFT COLUMN (25% - Group + Members)
-   ============================================ */
+   LEFT COLUMN (Group + Members)
+============================================ */
 
 .left-column {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    height: fit-content;
 }
 
+/* Sticky on desktop */
 @media (min-width: 1024px) {
     .left-column {
-        height: 100%;
-        max-height: 100vh;
+        position: sticky;
+        top: 6rem; /* Account for navbar height */
+        align-self: flex-start;
+        max-height: calc(100vh - 8rem);
         overflow-y: auto;
     }
 }
 
-/* Group Section - Top half */
-.group-section {
-    flex: 0 0 auto;
-    min-height: 300px;
+.group-section,
+.members-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
 }
 
-/* Members Section - Bottom half */
-.members-section {
-    flex: 1 1 auto;
-    min-height: 300px;
-    max-height: 500px;
-    overflow-y: auto;
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title .count {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #718096;
+    background-color: #edf2f7;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
 }
 
 /* ============================================
-   RIGHT COLUMN (75% - Toggle + Content)
-   ============================================ */
+   RIGHT COLUMN (Kanban/Expenses)
+============================================ */
 
 .right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    min-height: 500px;
+    min-height: 600px;
 }
 
 /* ============================================
    VIEW TOGGLE BUTTONS
-   ============================================ */
+============================================ */
 
 .view-toggle {
     display: flex;
     gap: 1rem;
-    padding: 1rem;
+    margin-bottom: 1.5rem;
     background: white;
+    padding: 0.5rem;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .toggle-btn {
     flex: 1;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #718096;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .toggle-btn:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-    background: #eff6ff;
+    background: #f7fafc;
+    color: #4a5568;
 }
 
 .toggle-btn.active {
-    border-color: #3b82f6;
-    background: #3b82f6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
     color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.toggle-btn.active:hover {
-    background: #2563eb;
-    border-color: #2563eb;
+.toggle-icon {
+    font-size: 1.5rem;
+}
+
+.toggle-text {
+    font-size: 1rem;
 }
 
 /* ============================================
    CONTENT CONTAINER
-   ============================================ */
+============================================ */
 
 .content-container {
-    flex: 1;
     position: relative;
     min-height: 500px;
 }
 
 .view-content {
-    width: 100%;
     opacity: 1;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .view-content.hidden {
@@ -135,4 +221,177 @@
 .view-content.active {
     display: block;
     opacity: 1;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
+
+@media (max-width: 1024px) {
+    .dashboard-layout {
+        gap: 1.5rem;
+        padding: 0 0.75rem;
+    }
+    
+    .page-header {
+        padding: 1rem 0.75rem 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .header-title h1 {
+        font-size: 1.75rem;
+    }
+    
+    .header-title .subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .left-column {
+        gap: 1.25rem;
+    }
+    
+    .group-section,
+    .members-section {
+        padding: 1.25rem;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-layout {
+        gap: 1.25rem;
+        padding: 0 0.5rem;
+    }
+    
+    .page-header {
+        padding: 0.75rem 0.5rem 0.5rem;
+    }
+    
+    .header-left {
+        gap: 0.75rem;
+    }
+    
+    .btn-back {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.9rem;
+    }
+    
+    .header-title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .header-title .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .view-toggle {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.375rem;
+    }
+    
+    .toggle-btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .toggle-icon {
+        font-size: 1.25rem;
+    }
+    
+    .group-section,
+    .members-section {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .btn-back {
+        align-self: flex-start;
+    }
+    
+    .header-title h1 {
+        font-size: 1.375rem;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        flex-wrap: wrap;
+    }
+}
+
+/* ============================================
+   LOADING STATES
+============================================ */
+
+.dashboard-page.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.content-container.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+============================================ */
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Custom scrollbar for left column */
+.left-column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.left-column::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.left-column::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.left-column::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
 }

@@ -1,71 +1,62 @@
-<div id="expense-form-modal" class="modal hidden">
-    <div class="modal-content">
-        <h3 id="expense-modal-title" class="text-xl font-bold mb-4">Add New Expense</h3>
+<!-- ============================================
+     EXPENSES COMPONENT - PLACEHOLDER
+     ============================================
+     
+     Temporary placeholder for expenses tracker.
+     Shows expense list without full functionality.
+============================================ -->
+
+<div class="expenses-placeholder">
+    <div class="placeholder-message">
+        <h3>💰 Expenses Tracker</h3>
+        <p>Expenses tracker component is being implemented.</p>
+        <p>Expenses will appear here soon!</p>
         
-        <form id="expense-form">
-            <!-- Hidden field for expense ID (used for editing) -->
-            <input type="hidden" id="expense-id" name="id" value="">
-            
-            <div class="form-group">
-                <label for="expense-title">Title</label>
-                <input type="text" id="expense-title" name="title" required placeholder="e.g., Groceries for the week">
+        <% if (expenses && expenses.length > 0) { %>
+            <div class="expense-count">
+                <strong><%= expenses.length %></strong> expense<%= expenses.length !== 1 ? 's' : '' %> in this group
             </div>
-
-            <div class="form-group">
-                <label for="expense-value">Amount</label>
-                <input type="number" step="0.01" id="expense-value" name="value" required placeholder="0.00">
+        <% } else { %>
+            <div class="empty-state">
+                <p>No expenses yet. Add your first expense!</p>
             </div>
-
-            <div class="form-group">
-                <label for="expense-currency">Currency</label>
-                <select id="expense-currency" name="currency">
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR" selected>EUR (€)</option>
-                    <option value="RON">RON (Lei)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="expense-description">Description (Optional)</label>
-                <textarea id="expense-description" name="description" rows="3" placeholder="Details about what the money was spent on..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="expense-due">Due Date (Optional)</label>
-                <input type="date" id="expense-due" name="due">
-            </div>
-            
-            <div class="button-group mt-4">
-                <button type="button" id="cancel-expense-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" id="submit-expense-btn" class="btn-primary">Save Expense</button>
-            </div>
-        </form>
+        <% } %>
     </div>
 </div>
 
-<!-- 2. Record Contribution Modal -->
-<div id="contribution-modal" class="modal hidden">
-    <div class="modal-content">
-        <h3 class="text-xl font-bold mb-4">Record Contribution</h3>
-        
-        <form id="contribution-form">
-            <!-- Hidden field for the target expense ID -->
-            <input type="hidden" id="contribution-expense-id" name="expenseId">
-            
-            <p class="text-lg mb-4">
-                Expense: <span id="contribution-expense-title" class="font-semibold"></span> 
-                (Remaining: <span id="contribution-expense-balance" class="font-bold text-red-600"></span>)
-            </p>
+<style>
+.expenses-placeholder {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-            <div class="form-group">
-                <label for="contribution-value">Contribution Amount</label>
-                <input type="number" step="0.01" id="contribution-value" name="value" required placeholder="0.00">
-            </div>
-            
-            <div class="button-group mt-4">
-                <button type="button" id="cancel-contribution-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" id="submit-contribution-btn" class="btn-primary">Record</button>
-            </div>
-        </form>
-    </div>
-</div>
+.placeholder-message h3 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+}
+
+.placeholder-message p {
+    color: #718096;
+    margin: 0.5rem 0;
+}
+
+.expense-count {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #edf2f7;
+    border-radius: 8px;
+    font-size: 1.125rem;
+}
+
+.empty-state {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+}
+</style>

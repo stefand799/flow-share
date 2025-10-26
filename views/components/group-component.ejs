@@ -1,159 +1,212 @@
-<script src="/js/components/group-component.js"></script>
+<!-- ============================================
+     GROUP COMPONENT
+     ============================================
+     
+     Displays group details with:
+     - Group name and description
+     - Creation date
+     - Member count
+     - Action buttons (Add Member, Edit, Delete)
+     - Only admins see Edit/Delete buttons
+     
+     Includes modals for:
+     - Add member
+     - Edit group
+     - Delete group confirmation
+============================================ -->
 
-<div id="group-container" class="group-card">
-    <h2 class="group-title">Group Details</h2>
-
+<div class="group-card" id="group-card" data-group-id="<%= group.id %>">
+    
     <!-- Group Details Display -->
-    <div id="group-details" data-group-id="<%= group.id %>" class="group-details">
-
-        <div class="detail-item">
-            <p class="detail-label">Group Name</p>
-            <p class="detail-value"><%= group.name %></p>
+    <div class="group-details">
+        
+        <div class="detail-row">
+            <span class="detail-label">Group Name</span>
+            <span class="detail-value"><%= group.name %></span>
         </div>
-
-        <div class="detail-item">
-            <p class="detail-label">Description</p>
-            <p class="detail-value detail-description">
+        
+        <div class="detail-row">
+            <span class="detail-label">Description</span>
+            <span class="detail-value detail-description">
                 <%= group.description || 'No description provided' %>
-            </p>
+            </span>
         </div>
-
-        <div class="detail-item">
-            <p class="detail-label">Created</p>
-            <p class="detail-value">
+        
+        <div class="detail-row">
+            <span class="detail-label">Created</span>
+            <span class="detail-value">
                 <%= new Date(group.createdAt).toLocaleDateString() %>
-            </p>
+            </span>
         </div>
-
-        <% if (typeof members !== 'undefined') { %>
-        <div class="detail-item">
-            <p class="detail-label">Members</p>
-            <p class="detail-value"><%= members.length %> members</p>
+        
+        <div class="detail-row">
+            <span class="detail-label">Members</span>
+            <span class="detail-value"><%= members.length %> member<%= members.length !== 1 ? 's' : '' %></span>
         </div>
-        <% } %>
+        
     </div>
-
+    
     <!-- Action Buttons -->
     <div class="group-actions">
-        <button id="add-member-btn" class="btn-primary">
-            Add Member
+        
+        <!-- Add Member (all members can do this) -->
+        <button id="add-member-btn" class="btn btn-primary btn-block" type="button">
+            ➕ Add Member
         </button>
         
-        <% 
-        // Check if currentUserMember exists and is admin
-        const isAdmin = typeof currentUserMember !== 'undefined' && currentUserMember && currentUserMember.isAdmin;
-        %>
-        
-        <% if (isAdmin) { %>
-            <button id="edit-group-btn" class="btn-secondary">
-                Edit Group
+        <!-- Admin-only buttons -->
+        <% if (currentMember && currentMember.isAdmin) { %>
+            <button id="edit-group-btn" class="btn btn-secondary btn-block" type="button">
+                ✏️ Edit Group
             </button>
-            <button id="delete-group-btn" class="btn-danger">
-                Delete Group
+            <button id="delete-group-btn" class="btn btn-danger btn-block" type="button">
+                🗑️ Delete Group
             </button>
         <% } %>
+        
     </div>
+    
 </div>
 
-<!-- Add Member Modal -->
+<!-- ============================================
+     ADD MEMBER MODAL
+============================================ -->
 <div id="add-member-modal" class="modal hidden">
-    <div class="modal-content modal-small">
-        <h3 class="modal-title">Add Member to Group</h3>
-
-        <form id="add-member-form" action="/api/groups/add-member" method="POST">
-            <input type="hidden" name="groupId" value="<%= group.id %>">
-            
-            <div class="form-group">
-                <label for="member-username">Username</label>
-                <input 
-                    type="text" 
-                    id="member-username" 
-                    name="username" 
-                    required
-                    placeholder="Enter username"
-                >
-                <small style="color: #6b7280; font-size: 0.875rem;">
-                    Enter the exact username of the person you want to add
-                </small>
-            </div>
-
-            <div class="button-group">
-                <button type="button" id="cancel-add-member-btn" class="btn-secondary">
-                    Cancel
-                </button>
-                <button type="submit" class="btn-primary">
-                    Add Member
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<% if (isAdmin) { %>
-<!-- Edit Group Modal (Only render if admin) -->
-<div id="edit-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
     <div class="modal-content">
-        <h3 class="modal-title">Edit Group Details</h3>
-
-        <form id="edit-group-form" action="/api/groups/<%= group.id %>" method="PUT">
-            
-            <div class="form-content">
+        <div class="modal-header">
+            <h3>Add Member to Group</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-instruction">Enter the username of the person you want to add:</p>
+            <form id="add-member-form">
                 <div class="form-group">
-                    <label for="edit-name">Group Name</label>
+                    <label for="member-username">Username *</label>
                     <input 
                         type="text" 
-                        id="edit-name" 
-                        name="name" 
-                        value="<%= group.name %>"
+                        id="member-username" 
+                        name="username"
+                        class="form-input"
+                        placeholder="Enter username"
                         required
+                        autofocus
                     >
+                    <small class="form-error" id="member-username-error"></small>
                 </div>
-
-                <div class="form-group">
-                    <label for="edit-description">Description</label>
-                    <textarea 
-                        id="edit-description" 
-                        name="description" 
-                        rows="4"
-                    ><%= group.description || '' %></textarea>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button type="button" id="cancel-edit-btn" class="btn-secondary">
-                    Cancel
-                </button>
-                <button type="submit" class="btn-primary">
-                    Save Changes
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="add-member-modal" type="button">
+                Cancel
+            </button>
+            <button id="add-member-submit-btn" class="btn btn-primary" type="button">
+                Add Member
+            </button>
+        </div>
     </div>
 </div>
 
-<!-- Delete Group Modal (Only render if admin) -->
-<div id="delete-modal" class="modal hidden">
-    <div class="modal-content modal-small">
-        <h3 class="modal-title modal-title-danger">⚠️ Delete Group</h3>
-        
-        <p class="modal-message">
-            <strong style="color: #dc2626;">WARNING:</strong> Deleting this group is permanent. All tasks, expenses, and data will be lost.
-        </p>
+<!-- ============================================
+     EDIT GROUP MODAL (Admin Only)
+============================================ -->
+<% if (currentMember && currentMember.isAdmin) { %>
+<div id="edit-group-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Group</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-group-form">
+                
+                <!-- Group Name -->
+                <div class="form-group">
+                    <label for="edit-group-name">Group Name *</label>
+                    <input 
+                        type="text" 
+                        id="edit-group-name" 
+                        name="name"
+                        class="form-input"
+                        value="<%= group.name %>"
+                        required
+                        minlength="3"
+                        maxlength="50"
+                    >
+                    <small class="form-hint">3-50 characters</small>
+                    <small class="form-error" id="group-name-error"></small>
+                </div>
+                
+                <!-- Group Description -->
+                <div class="form-group">
+                    <label for="edit-group-description">Description</label>
+                    <textarea 
+                        id="edit-group-description" 
+                        name="description"
+                        class="form-input"
+                        rows="3"
+                        maxlength="200"
+                    ><%= group.description || '' %></textarea>
+                    <small class="form-hint">Optional, maximum 200 characters</small>
+                </div>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="edit-group-modal" type="button">
+                Cancel
+            </button>
+            <button id="save-group-btn" class="btn btn-primary" type="button">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
 
-        <p class="modal-message" style="margin-top: 1rem;">
-            Are you sure you want to delete "<%= group.name %>"?
-        </p>
-
-        <form id="delete-group-form" action="/api/groups/<%= group.id %>" method="DELETE">
-            <div class="button-group">
-                <button type="button" id="cancel-delete-btn" class="btn-secondary">
-                    Cancel
-                </button>
-                <button type="submit" class="btn-danger">
-                    Yes, Delete Group
-                </button>
-            </div>
-        </form>
+<!-- ============================================
+     DELETE GROUP CONFIRMATION MODAL (Admin Only)
+============================================ -->
+<div id="delete-group-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Delete Group</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="warning-text">
+                ⚠️ <strong>Warning:</strong> This action cannot be undone. 
+                Deleting this group will permanently remove:
+            </p>
+            <ul class="warning-list">
+                <li>All group members</li>
+                <li>All tasks and assignments</li>
+                <li>All expenses and contributions</li>
+                <li>The group itself</li>
+            </ul>
+            <p class="confirmation-prompt">
+                Type <strong>"DELETE"</strong> to confirm:
+            </p>
+            <input 
+                type="text" 
+                id="delete-group-confirmation-input" 
+                class="form-input"
+                placeholder="Type DELETE to confirm"
+                autocomplete="off"
+            >
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="delete-group-modal" type="button">
+                Cancel
+            </button>
+            <button id="confirm-delete-group-btn" class="btn btn-danger" type="button" disabled>
+                Delete Group
+            </button>
+        </div>
     </div>
 </div>
 <% } %>
+
+<!-- Component-specific JavaScript -->
+<script src="/js/components/group-component.js"></script>

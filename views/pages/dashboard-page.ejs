@@ -1,4 +1,22 @@
-<!-- dashboard-page.ejs -->
+<!-- ============================================
+     DASHBOARD PAGE
+     ============================================
+     
+     This page displays a group dashboard with:
+     - Back button to home
+     - Group name and description
+     - Left column (25%):
+       - Group details component
+       - Members list component
+     - Right column (75%):
+       - Toggle between Kanban and Expenses
+       - Kanban board component
+       - Expenses tracker component
+     
+     Protected route - requires authentication
+     Server provides: group, currentMember, members, tasks, expenses
+============================================ -->
+
 <div class="dashboard-page">
     
     <!-- Page Header with Back Button -->
@@ -14,7 +32,7 @@
         </div>
     </div>
     
-    <!-- Main Layout: Group/Members (left) + Activity (right) -->
+    <!-- Main Layout: Group/Members (left) + Kanban/Expenses (right) -->
     <div class="dashboard-layout">
         
         <!-- LEFT COLUMN: Group Info + Members (25% width) -->
@@ -52,13 +70,13 @@
             
             <!-- View Toggle Buttons -->
             <div class="view-toggle">
-                <button id="kanban-btn" class="toggle-btn active" data-view="kanban">
-                    <span>📋</span>
-                    <span>Kanban</span>
+                <button id="kanban-btn" class="toggle-btn active" data-view="kanban" type="button">
+                    <span class="toggle-icon">📋</span>
+                    <span class="toggle-text">Kanban Board</span>
                 </button>
-                <button id="expenses-btn" class="toggle-btn" data-view="expenses">
-                    <span>💰</span>
-                    <span>Expenses</span>
+                <button id="expenses-btn" class="toggle-btn" data-view="expenses" type="button">
+                    <span class="toggle-icon">💰</span>
+                    <span class="toggle-text">Expenses</span>
                 </button>
             </div>
             
@@ -71,6 +89,7 @@
                         tasks: tasks,
                         group: group,
                         currentMember: currentMember,
+                        members: members,
                         user: user
                     }) %>
                 </div>
@@ -94,43 +113,5 @@
     
 </div>
 
-<!-- Toggle View Script -->
-<script>
-    // Load saved view preference
-    const savedView = localStorage.getItem('dashboardView-<%= group.id %>') || 'kanban';
-    
-    // Get elements
-    const kanbanBtn = document.getElementById('kanban-btn');
-    const expensesBtn = document.getElementById('expenses-btn');
-    const kanbanView = document.getElementById('kanban-view');
-    const expensesView = document.getElementById('expenses-view');
-    
-    // Switch view function
-    function switchView(viewName) {
-        if (viewName === 'kanban') {
-            kanbanBtn.classList.add('active');
-            expensesBtn.classList.remove('active');
-            kanbanView.classList.add('active');
-            kanbanView.classList.remove('hidden');
-            expensesView.classList.remove('active');
-            expensesView.classList.add('hidden');
-        } else if (viewName === 'expenses') {
-            expensesBtn.classList.add('active');
-            kanbanBtn.classList.remove('active');
-            expensesView.classList.add('active');
-            expensesView.classList.remove('hidden');
-            kanbanView.classList.remove('active');
-            kanbanView.classList.add('hidden');
-        }
-        
-        // Save preference per group
-        localStorage.setItem('dashboardView-<%= group.id %>', viewName);
-    }
-    
-    // Set initial view
-    switchView(savedView);
-    
-    // Event listeners
-    kanbanBtn.addEventListener('click', () => switchView('kanban'));
-    expensesBtn.addEventListener('click', () => switchView('expenses'));
-</script>
+<!-- Page-specific JavaScript -->
+<script src="/js/pages/dashboard-page.js"></script>

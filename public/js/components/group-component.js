@@ -1,191 +1,229 @@
-// File: public/js/components/group-component.js
+// ============================================
+// GROUP-COMPONENT.JS - Group Component JavaScript
+// ============================================
+// 
+// This file handles:
+// - Add member modal and API call
+// - Edit group modal and API call (admin only)
+// - Delete group modal and API call (admin only)
+// - Form validation
+// 
+// Dependencies: modal.js, dashboardUtils (from dashboard-page.js)
+// ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     
     // ============================================
-    // GET MODAL AND BUTTON ELEMENTS
+    // DOM ELEMENTS
     // ============================================
     
-    const addMemberModal = document.getElementById('add-member-modal');
-    const editModal = document.getElementById('edit-modal');
-    const deleteModal = document.getElementById('delete-modal');
+    const groupCard = document.getElementById('group-card');
+    const groupId = groupCard?.dataset.groupId;
     
+    // Buttons
     const addMemberBtn = document.getElementById('add-member-btn');
-    const editBtn = document.getElementById('edit-group-btn');
-    const deleteBtn = document.getElementById('delete-group-btn');
+    const editGroupBtn = document.getElementById('edit-group-btn');
+    const deleteGroupBtn = document.getElementById('delete-group-btn');
     
-    const cancelAddMemberBtn = document.getElementById('cancel-add-member-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    // Add Member
+    const addMemberSubmitBtn = document.getElementById('add-member-submit-btn');
+    const memberUsernameInput = document.getElementById('member-username');
     
-    const addMemberForm = document.getElementById('add-member-form');
-    const editForm = document.getElementById('edit-group-form');
-    const deleteForm = document.getElementById('delete-group-form');
-
-    // ============================================
-    // MODAL CONTROL FUNCTIONS
-    // ============================================
+    // Edit Group
+    const saveGroupBtn = document.getElementById('save-group-btn');
+    const editGroupNameInput = document.getElementById('edit-group-name');
+    const editGroupDescriptionInput = document.getElementById('edit-group-description');
     
-    const openModal = (modal) => {
-        if (modal) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-    };
-
-    const closeModal = (modal) => {
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-    };
-
+    // Delete Group
+    const confirmDeleteGroupBtn = document.getElementById('confirm-delete-group-btn');
+    const deleteGroupConfirmationInput = document.getElementById('delete-group-confirmation-input');
+    
     // ============================================
-    // OPEN MODAL EVENT LISTENERS
+    // ADD MEMBER FUNCTIONALITY
     // ============================================
     
     if (addMemberBtn) {
-        addMemberBtn.addEventListener('click', () => openModal(addMemberModal));
-    }
-    
-    if (editBtn) {
-        editBtn.addEventListener('click', () => openModal(editModal));
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => openModal(deleteModal));
-    }
-
-    // ============================================
-    // CLOSE MODAL EVENT LISTENERS
-    // ============================================
-    
-    if (cancelAddMemberBtn) {
-        cancelAddMemberBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(addMemberModal);
+        addMemberBtn.addEventListener('click', () => {
+            openModal('add-member-modal');
         });
     }
-
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(editModal);
+    
+    if (addMemberSubmitBtn) {
+        addMemberSubmitBtn.addEventListener('click', async () => {
+            await addMember();
         });
     }
-
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(deleteModal);
-        });
-    }
-
-    // ============================================
-    // CLOSE MODALS ON BACKDROP CLICK
-    // ============================================
     
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal(modal);
-            }
-        });
-    });
-
-    // ============================================
-    // ADD MEMBER FORM SUBMISSION
-    // ============================================
-    
-    if (addMemberForm) {
-        addMemberForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    async function addMember() {
+        try {
+            const username = memberUsernameInput.value.trim();
             
-            const formData = new FormData(addMemberForm);
-            const data = Object.fromEntries(formData);
-
-            try {
-                const response = await fetch('/api/groups/add-member', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.ok) {
-                    alert('Member added successfully!');
-                    closeModal(addMemberModal);
-                    window.location.reload();
-                } else {
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.message || 'Failed to add member'}`);
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-                alert('An unexpected error occurred.');
+            if (!username) {
+                showError('member-username-error', 'Please enter a username');
+                return;
             }
-        });
+            
+            addMemberSubmitBtn.disabled = true;
+            addMemberSubmitBtn.textContent = 'Adding...';
+            
+            const response = await fetch(`/api/groups/${groupId}/add-member`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to add member');
+            }
+            
+            closeModal('add-member-modal');
+            memberUsernameInput.value = '';
+            window.dashboardUtils?.showSuccess('Member added successfully!');
+            
+            setTimeout(() => window.location.reload(), 1000);
+            
+        } catch (error) {
+            console.error('Error adding member:', error);
+            window.dashboardUtils?.showError(`Failed to add member: ${error.message}`);
+        } finally {
+            addMemberSubmitBtn.disabled = false;
+            addMemberSubmitBtn.textContent = 'Add Member';
+        }
     }
-
+    
     // ============================================
-    // EDIT GROUP FORM SUBMISSION
+    // EDIT GROUP FUNCTIONALITY (Admin Only)
     // ============================================
     
-    if (editForm) {
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(editForm);
-            const data = Object.fromEntries(formData);
-            const actionUrl = editForm.action;
-
-            try {
-                const response = await fetch(actionUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.ok) {
-                    alert('Group updated successfully!');
-                    closeModal(editModal);
-                    window.location.reload();
-                } else {
-                    const errorData = await response.json();
-                    alert(`Update failed: ${errorData.message || 'Server error'}`);
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-                alert('An unexpected error occurred.');
-            }
+    if (editGroupBtn) {
+        editGroupBtn.addEventListener('click', () => {
+            openModal('edit-group-modal');
         });
     }
-
+    
+    if (saveGroupBtn) {
+        saveGroupBtn.addEventListener('click', async () => {
+            await updateGroup();
+        });
+    }
+    
+    async function updateGroup() {
+        try {
+            const name = editGroupNameInput.value.trim();
+            const description = editGroupDescriptionInput.value.trim();
+            
+            if (!name || name.length < 3) {
+                showError('group-name-error', 'Group name must be at least 3 characters');
+                return;
+            }
+            
+            saveGroupBtn.disabled = true;
+            saveGroupBtn.textContent = 'Saving...';
+            
+            const response = await fetch(`/api/groups/${groupId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description: description || null })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to update group');
+            }
+            
+            closeModal('edit-group-modal');
+            window.dashboardUtils?.showSuccess('Group updated successfully!');
+            
+            setTimeout(() => window.location.reload(), 1000);
+            
+        } catch (error) {
+            console.error('Error updating group:', error);
+            window.dashboardUtils?.showError(`Failed to update group: ${error.message}`);
+        } finally {
+            saveGroupBtn.disabled = false;
+            saveGroupBtn.textContent = 'Save Changes';
+        }
+    }
+    
     // ============================================
-    // DELETE GROUP FORM SUBMISSION
+    // DELETE GROUP FUNCTIONALITY (Admin Only)
     // ============================================
     
-    if (deleteForm) {
-        deleteForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const actionUrl = deleteForm.action;
-
-            try {
-                const response = await fetch(actionUrl, {
-                    method: 'DELETE',
-                });
-
-                if (response.ok) {
-                    alert('Group deleted successfully!');
-                    window.location.href = '/dashboard';
-                } else {
-                    const errorData = await response.json();
-                    alert(`Deletion failed: ${errorData.message || 'Server error'}`);
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-                alert('An unexpected error occurred.');
+    if (deleteGroupBtn) {
+        deleteGroupBtn.addEventListener('click', () => {
+            openModal('delete-group-modal');
+            if (deleteGroupConfirmationInput) {
+                deleteGroupConfirmationInput.value = '';
             }
         });
     }
+    
+    if (deleteGroupConfirmationInput) {
+        deleteGroupConfirmationInput.addEventListener('input', () => {
+            const isConfirmed = deleteGroupConfirmationInput.value.toUpperCase() === 'DELETE';
+            confirmDeleteGroupBtn.disabled = !isConfirmed;
+        });
+    }
+    
+    if (confirmDeleteGroupBtn) {
+        confirmDeleteGroupBtn.addEventListener('click', async () => {
+            await deleteGroup();
+        });
+    }
+    
+    async function deleteGroup() {
+        try {
+            confirmDeleteGroupBtn.disabled = true;
+            confirmDeleteGroupBtn.textContent = 'Deleting...';
+            
+            const response = await fetch(`/api/groups/${groupId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to delete group');
+            }
+            
+            closeModal('delete-group-modal');
+            alert('Group deleted successfully. Redirecting to home...');
+            window.location.href = '/home';
+            
+        } catch (error) {
+            console.error('Error deleting group:', error);
+            window.dashboardUtils?.showError(`Failed to delete group: ${error.message}`);
+            confirmDeleteGroupBtn.disabled = false;
+            confirmDeleteGroupBtn.textContent = 'Delete Group';
+        }
+    }
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    }
+    
+    // Clear errors on input
+    if (memberUsernameInput) {
+        memberUsernameInput.addEventListener('input', () => {
+            const errorElement = document.getElementById('member-username-error');
+            if (errorElement) errorElement.textContent = '';
+        });
+    }
+    
+    if (editGroupNameInput) {
+        editGroupNameInput.addEventListener('input', () => {
+            const errorElement = document.getElementById('group-name-error');
+            if (errorElement) errorElement.textContent = '';
+        });
+    }
+    
 });

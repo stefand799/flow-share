@@ -1,127 +1,62 @@
-<div id="kanban-board-container" class="kanban-board-wrapper" data-group-id="<%= group.id %>">
-    <h2 class="text-3xl font-semibold mb-6 text-gray-800">Kanban Board: <%= group.name %></h2>
-    
-    <div id="kanban-columns" class="kanban-columns-grid">
+<!-- ============================================
+     KANBAN COMPONENT - PLACEHOLDER
+     ============================================
+     
+     Temporary placeholder for kanban board.
+     Shows task list without drag-and-drop.
+============================================ -->
+
+<div class="kanban-placeholder">
+    <div class="placeholder-message">
+        <h3>📋 Kanban Board</h3>
+        <p>Kanban board component is being implemented.</p>
+        <p>Tasks will appear here soon!</p>
         
-        <% 
-            const stages = {
-                'TO_DO': { title: 'To Do', tasks: tasks.filter(t => t.stage === 'TO_DO') },
-                'IN_PROGRESS': { title: 'In Progress', tasks: tasks.filter(t => t.stage === 'IN_PROGRESS') },
-                'DONE': { title: 'Done', tasks: tasks.filter(t => t.stage === 'DONE') }
-            };
-        %>
-
-        <% Object.keys(stages).forEach(stageKey => { %>
-            <div 
-                class="kanban-column" 
-                data-stage="<%= stageKey %>"
-                id="column-<%= stageKey %>"
-            >
-                <h3 class="column-title"><%= stages[stageKey].title %> (<span id="count-<%= stageKey %>"><%= stages[stageKey].tasks.length %></span>)</h3>
-
-                <div class="task-list" id="task-list-<%= stageKey %>">
-                    
-                    <% stages[stageKey].tasks.forEach(task => { %>
-                        <% 
-                            const isClaimed = !!task.groupMemberId;
-                            const isClaimedByCurrentUser = isClaimed && task.groupMemberId === currentUserGroupMember.id;
-                            const assignedUserName = isClaimed ? (task.assignedTo?.user?.firstName || task.assignedTo?.user?.username || 'Assigned User') : 'Unassigned';
-                            const formattedDueDate = new Date(task.due).toLocaleDateString();
-                            
-                        %>
-
-                        <div 
-                            class="task-card <%= task.priority.toLowerCase() %>" 
-                            data-task-id="<%= task.id %>" 
-                            data-member-id="<%= task.groupMemberId || '' %>"
-                            draggable="true"
-                        >
-                            <div class="task-summary">
-                                <p class="task-title font-semibold"><%= task.name %></p>
-                                <p class="task-due text-sm text-gray-500">
-                                    Due: <%= formattedDueDate %>
-                                </p>
-                                <p class="task-claimed-by text-sm">
-                                    Assigned: <span class="font-medium assigned-user-name <%= isClaimed ? 'text-blue-600' : 'text-red-500' %>">
-                                        <%= assignedUserName %>
-                                    </span>
-                                </p>
-                            </div>
-                            
-                            <div class="task-details-expanded hidden">
-                                <p class="mt-2 text-gray-700 description-text">
-                                    <strong>Description:</strong> <%= task.description || 'No description provided.' %>
-                                </p>
-
-                                <div class="action-buttons mt-4 space-y-2">
-                                    
-                                    <% if (!isClaimed) { %>
-                                        <button 
-                                            class="action-btn claim-btn w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded text-sm"
-                                            data-task-id="<%= task.id %>"
-                                            data-action="claim"
-                                        >
-                                            Claim Task
-                                        </button>
-                                    <% } else if (isClaimedByCurrentUser || currentUserGroupMember.isAdmin) { %>
-                                        <button 
-                                            class="action-btn unclaim-btn w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded text-sm"
-                                            data-task-id="<%= task.id %>"
-                                            data-action="unclaim"
-                                        >
-                                            Unclaim Task
-                                        </button>
-                                    <% } %>
-                                    
-                                    <button 
-                                        class="action-btn create-task-btn w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded text-sm"
-                                        data-group-id="<%= group.id %>"
-                                    >
-                                        New Task
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                    
-                </div>
+        <% if (tasks && tasks.length > 0) { %>
+            <div class="task-count">
+                <strong><%= tasks.length %></strong> task<%= tasks.length !== 1 ? 's' : '' %> in this group
             </div>
-        <% }); %>
-
-    </div>
-    
-</div>
-
-<div id="create-task-modal" class="modal hidden">
-    <div class="modal-content">
-        <h3 class="text-xl font-bold mb-4">Create New Task</h3>
-        <form id="create-task-form">
-            <div class="form-group">
-                <label for="task-name">Task Name</label>
-                <input type="text" id="task-name" name="name" required>
+        <% } else { %>
+            <div class="empty-state">
+                <p>No tasks yet. Create your first task!</p>
             </div>
-            <div class="form-group">
-                <label for="task-description">Description</label>
-                <textarea id="task-description" name="description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="task-due">Due Date</label>
-                <input type="date" id="task-due" name="due" required>
-            </div>
-            <div class="form-group">
-                <label for="task-priority">Priority</label>
-                <select id="task-priority" name="priority">
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM" selected>Medium</option>
-                    <option value="HIGH">High</option>
-                </select>
-            </div>
-            <div class="button-group mt-4">
-                <button type="button" id="cancel-task-create-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">Create</button>
-            </div>
-        </form>
+        <% } %>
     </div>
 </div>
 
-<script src="/js/components/kanban-logic.js"></script>
+<style>
+.kanban-placeholder {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-message h3 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+}
+
+.placeholder-message p {
+    color: #718096;
+    margin: 0.5rem 0;
+}
+
+.task-count {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #edf2f7;
+    border-radius: 8px;
+    font-size: 1.125rem;
+}
+
+.empty-state {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+}
+</style>

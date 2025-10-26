@@ -1,106 +1,130 @@
-/* ============================================
-   MEMBERS CONTAINER
-   ============================================ */
+/* MEMBERS-COMPONENT.CSS - Members List Styles */
 
 .members-card {
     background: white;
-    padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
-
-.members-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e5e7eb;
-}
-
-/* ============================================
-   MEMBERS LIST
-   ============================================ */
-
-.members-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-/* Custom scrollbar */
-.members-list::-webkit-scrollbar {
-    width: 8px;
-}
-
-.members-list::-webkit-scrollbar-track {
-    background: #f3f4f6;
-    border-radius: 4px;
-}
-
-.members-list::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 4px;
-}
-
-.members-list::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-}
-
-/* ============================================
-   MEMBER LIST ITEM
-   ============================================ */
-
-.member-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.member-item:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.member-name {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #1f2937;
-}
-
-.member-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-weight: 600;
-}
-
-.member-badge.admin {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.member-badge.member {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-/* ============================================
-   NO MEMBERS MESSAGE
-   ============================================ */
 
 .no-members {
     padding: 2rem;
     text-align: center;
-    color: #9ca3af;
-    font-style: italic;
+    color: #718096;
+}
+
+.members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #f7fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-item:last-child {
+    border-bottom: none;
+}
+
+.member-item:hover {
+    background: #f7fafc;
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.avatar-initials {
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.member-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.95rem;
+}
+
+.member-badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.member-badge.admin {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.member-badge.member {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.member-arrow {
+    color: #cbd5e0;
+    font-size: 1.5rem;
+}
+
+/* Member details in modal */
+.member-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.member-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.member-detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a0aec0;
+    text-transform: uppercase;
+}
+
+.member-detail-value {
+    font-size: 0.95rem;
+    color: #2d3748;
+}
+
+@media (max-width: 768px) {
+    .member-item {
+        padding: 0.875rem;
+    }
+    
+    .member-avatar {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .avatar-initials {
+        font-size: 0.8125rem;
+    }
 }
