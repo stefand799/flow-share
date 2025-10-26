@@ -70,7 +70,7 @@ export const handleLogin = async (req: Request, res: Response) => {
         });
 
         // Redirect to dashboard on success
-        return res.redirect("/dashboard");
+        return res.redirect("/home");
     } catch (err: any) {
         console.error("Login error:", err);
         
