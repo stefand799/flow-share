@@ -4,11 +4,34 @@ import { authenticate } from "../middleware/auth-middleware";
 
 const router = Router();
 
-// Public routes
+// ============================================
+// PUBLIC AUTHENTICATION ROUTES
+// ============================================
+
+/**
+ * POST /auth/register
+ * Register a new user account
+ * Body: { username, emailAddress, password }
+ */
 router.post("/register", AuthController.handleRegister);
+
+/**
+ * POST /auth/login
+ * Login with existing credentials
+ * Body: { credentials, password }
+ * credentials can be username, email, or phone
+ */
 router.post("/login", AuthController.handleLogin);
 
-// Protected route
+// ============================================
+// PROTECTED AUTHENTICATION ROUTES
+// ============================================
+
+/**
+ * POST /auth/logout
+ * Logout current user (requires authentication)
+ * Clears authentication cookie
+ */
 router.post("/logout", authenticate, AuthController.handleLogout);
 
 export default router;

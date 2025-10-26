@@ -5,44 +5,59 @@ import { findUserById } from "../services/user-service";
 
 type SafeUser = Omit<User, 'passwordHash'>;
 
+/**
+ * Extended Request interface with authenticated user
+ */
 export interface AuthenticatedRequest extends Request {
     user?: SafeUser;
 }
 
-// Middleware to verify JWT and attach user to request
+/**
+ * Authentication middleware
+ * Verifies JWT token from cookies and attaches user to request
+ * Redirects to login page if authentication fails
+ */
 export const authenticate = async (
     req: AuthenticatedRequest, 
     res: Response, 
     next: NextFunction
-) => {
+): Promise<void> => {
     const token = req.cookies.token;
 
-    // No token - redirect to login
+    // No token present - redirect to login
     if (!token) {
-        return res.redirect("/login");
+        res.redirect("/login");
+        return;
     }
 
     try {
-        // Verify token
+        // Verify and decode JWT token
         const decoded = verifyToken(token);
+        
         if (!decoded) {
+            console.warn("Invalid token detected");
             res.clearCookie('token');
-            return res.redirect("/login");
+            res.redirect("/login");
+            return;
         }
 
-        // Get user from database
+        // Fetch user from database
         const user = await findUserById(decoded.id);
+        
         if (!user) {
+            console.warn(`User not found for ID: ${decoded.id}`);
             res.clearCookie('token');
-            return res.redirect("/login");
+            res.redirect("/login");
+            return;
         }
 
         // Attach user to request and continue
         req.user = user;
         next();
     } catch (err) {
-        console.error("Authentication failed:", err);
+        console.error("Authentication error:", err);
         res.clearCookie("token");
-        return res.redirect("/login");
+        res.redirect("/login");
+        return;
     }
 };
