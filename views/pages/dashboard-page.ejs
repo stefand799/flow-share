@@ -1,61 +1,136 @@
-<script defer src="/js/pages/group-page.js"></script>
-
-<div class="group-page-layout">
-    <!-- LEFT COLUMN: 25% width -->
-    <div class="left-column">
-        
-        <!-- Group Component (Top half of left column) -->
-        <div class="group-section">
-            <%- include('../components/group-component', { 
-                group: group, 
-                currentUserMember: currentUserMember 
-            }) %>
-        </div>
-
-        <!-- Members Component (Bottom half of left column) -->
-        <div class="members-section">
-            <%- include('../components/members-component', { 
-                members: members, 
-                groupId: group.id,
-                currentUserMember: currentUserMember
-            }) %>
+<!-- dashboard-page.ejs -->
+<div class="dashboard-page">
+    
+    <!-- Page Header with Back Button -->
+    <div class="page-header">
+        <div class="header-left">
+            <a href="/home" class="btn-back" title="Back to Home">
+                ← Back
+            </a>
+            <div class="header-title">
+                <h1><%= group.name %></h1>
+                <p class="subtitle"><%= group.description || 'No description' %></p>
+            </div>
         </div>
     </div>
-
-    <!-- RIGHT COLUMN: 75% width -->
-    <div class="right-column">
+    
+    <!-- Main Layout: Group/Members (left) + Activity (right) -->
+    <div class="dashboard-layout">
         
-        <!-- View Toggle Buttons -->
-        <div class="view-toggle">
-            <button id="kanban-view-btn" class="toggle-btn active">
-                📋 Kanban Board
-            </button>
-            <button id="expenses-view-btn" class="toggle-btn">
-                💰 Expenses
-            </button>
-        </div>
-
-        <!-- Content Container (switches between kanban and expenses) -->
-        <div id="content-container" class="content-container">
+        <!-- LEFT COLUMN: Group Info + Members (25% width) -->
+        <div class="left-column">
             
-            <!-- Kanban Component (Shown by default) -->
-            <div id="kanban-view" class="view-content active">
-                <%- include('../components/kanban-component', { 
-                    group: group,
-                    tasks: tasks,
-                    currentUserMember: currentUserMember
+            <!-- Group Details Component -->
+            <div class="group-section">
+                <h2 class="section-title">Group Details</h2>
+                <%- include('../components/group-component', { 
+                    group: group, 
+                    currentMember: currentMember,
+                    members: members,
+                    user: user
                 }) %>
             </div>
-
-            <!-- Expenses Component (Hidden by default) -->
-            <div id="expenses-view" class="view-content hidden">
-                <%- include('../components/expenses-component', { 
-                    group: group,
-                    expenses: expenses,
-                    currentUserMember: currentUserMember
+            
+            <!-- Members Component -->
+            <div class="members-section">
+                <h2 class="section-title">
+                    Members 
+                    <span class="count">(<%= members.length %>)</span>
+                </h2>
+                <%- include('../components/members-component', { 
+                    members: members, 
+                    currentMember: currentMember,
+                    groupId: group.id,
+                    user: user
                 }) %>
             </div>
-
+            
         </div>
+        
+        <!-- RIGHT COLUMN: Kanban/Expenses Toggle (75% width) -->
+        <div class="right-column">
+            
+            <!-- View Toggle Buttons -->
+            <div class="view-toggle">
+                <button id="kanban-btn" class="toggle-btn active" data-view="kanban">
+                    <span>📋</span>
+                    <span>Kanban</span>
+                </button>
+                <button id="expenses-btn" class="toggle-btn" data-view="expenses">
+                    <span>💰</span>
+                    <span>Expenses</span>
+                </button>
+            </div>
+            
+            <!-- Content Container -->
+            <div class="content-container">
+                
+                <!-- Kanban View (shown by default) -->
+                <div id="kanban-view" class="view-content active">
+                    <%- include('../components/kanban-component', { 
+                        tasks: tasks,
+                        group: group,
+                        currentMember: currentMember,
+                        user: user
+                    }) %>
+                </div>
+                
+                <!-- Expenses View (hidden by default) -->
+                <div id="expenses-view" class="view-content hidden">
+                    <%- include('../components/expenses-component', { 
+                        expenses: expenses,
+                        group: group,
+                        members: members,
+                        currentMember: currentMember,
+                        user: user
+                    }) %>
+                </div>
+                
+            </div>
+            
+        </div>
+        
     </div>
+    
 </div>
+
+<!-- Toggle View Script -->
+<script>
+    // Load saved view preference
+    const savedView = localStorage.getItem('dashboardView-<%= group.id %>') || 'kanban';
+    
+    // Get elements
+    const kanbanBtn = document.getElementById('kanban-btn');
+    const expensesBtn = document.getElementById('expenses-btn');
+    const kanbanView = document.getElementById('kanban-view');
+    const expensesView = document.getElementById('expenses-view');
+    
+    // Switch view function
+    function switchView(viewName) {
+        if (viewName === 'kanban') {
+            kanbanBtn.classList.add('active');
+            expensesBtn.classList.remove('active');
+            kanbanView.classList.add('active');
+            kanbanView.classList.remove('hidden');
+            expensesView.classList.remove('active');
+            expensesView.classList.add('hidden');
+        } else if (viewName === 'expenses') {
+            expensesBtn.classList.add('active');
+            kanbanBtn.classList.remove('active');
+            expensesView.classList.add('active');
+            expensesView.classList.remove('hidden');
+            kanbanView.classList.remove('active');
+            kanbanView.classList.add('hidden');
+        }
+        
+        // Save preference per group
+        localStorage.setItem('dashboardView-<%= group.id %>', viewName);
+    }
+    
+    // Set initial view
+    switchView(savedView);
+    
+    // Event listeners
+    kanbanBtn.addEventListener('click', () => switchView('kanban'));
+    expensesBtn.addEventListener('click', () => switchView('expenses'));
+</script>

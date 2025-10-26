@@ -1,46 +1,70 @@
-<div class="auth-container login-page-container">
-    <h2>Sign In</h2>
-
-    <!-- Error Display (shown when login fails) -->
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="error-message">
-            <p><strong>Login Failed!</strong></p>
-            <p><%= error %></p>
+<!-- login-page.ejs -->
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <!-- Header -->
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Login to your FlowShare account</p>
+            </div>
+            
+            <!-- Error Alert -->
+            <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-error">
+                <span>⚠️</span>
+                <span><%= error %></span>
+            </div>
+            <% } %>
+            
+            <!-- Login Form -->
+            <form action="/auth/login" method="POST" class="auth-form">
+                
+                <!-- Credentials (username, email, or phone) -->
+                <div class="form-group">
+                    <label for="credentials">Username, Email, or Phone *</label>
+                    <input 
+                        type="text" 
+                        id="credentials" 
+                        name="credentials" 
+                        placeholder="Enter your username, email, or phone"
+                        value="<%= typeof credentials !== 'undefined' ? credentials : '' %>"
+                        required
+                        autofocus
+                    >
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block">
+                    Login
+                </button>
+                
+            </form>
+            
+            <!-- Divider -->
+            <div class="auth-divider">
+                <span>Don't have an account?</span>
+            </div>
+            
+            <!-- Register Link -->
+            <div class="auth-footer">
+                <a href="/register" class="btn btn-secondary btn-block">
+                    Create New Account
+                </a>
+            </div>
+            
         </div>
-    <% } %>
-
-    <!-- Login Form -->
-    <form action="/auth/login" method="POST">
-        <div>
-            <label for="credentials">Username or Email</label>
-            <input 
-                type="text" 
-                id="credentials" 
-                name="credentials" 
-                required 
-                placeholder="Username or email address"
-                value="<%= typeof credentials !== 'undefined' ? credentials : '' %>"
-            >
-        </div>
-
-        <div>
-            <label for="password">Password</label>
-            <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                required 
-                placeholder="Your password"
-            >
-        </div>
-
-        <button type="submit">Log In</button>
-    </form>
-
-    <p>
-        Don't have an account? 
-        <a href="/register">Register now</a>
-    </p>
+    </div>
 </div>
-
-<script defer src="/js/pages/login-page.js"></script>

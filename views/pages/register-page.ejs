@@ -1,57 +1,112 @@
-<div class="auth-container register-page-container">
-    <h2>Create Account</h2>
-
-    <!-- Error Display (shown when registration fails) -->
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="error-message">
-            <p><strong>Registration Failed!</strong></p>
-            <p><%= error %></p>
+<!-- register-page.ejs -->
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <!-- Header -->
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join FlowShare to collaborate with your team</p>
+            </div>
+            
+            <!-- Error Alert -->
+            <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-error">
+                <span>⚠️</span>
+                <span><%= error %></span>
+            </div>
+            <% } %>
+            
+            <!-- Registration Form -->
+            <form action="/auth/register" method="POST" class="auth-form" id="register-form">
+                
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Choose a unique username"
+                        required
+                        minlength="3"
+                        maxlength="30"
+                        autofocus
+                    >
+                    <small class="form-hint">3-30 characters</small>
+                </div>
+                
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="emailAddress">Email Address *</label>
+                    <input 
+                        type="email" 
+                        id="emailAddress" 
+                        name="emailAddress" 
+                        placeholder="your.email@example.com"
+                        required
+                    >
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Create a strong password"
+                        required
+                        minlength="6"
+                    >
+                    <small class="form-hint">At least 6 characters</small>
+                </div>
+                
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        placeholder="Re-enter your password"
+                        required
+                    >
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block">
+                    Create Account
+                </button>
+                
+            </form>
+            
+            <!-- Divider -->
+            <div class="auth-divider">
+                <span>Already have an account?</span>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="auth-footer">
+                <a href="/login" class="btn btn-secondary btn-block">
+                    Login to Your Account
+                </a>
+            </div>
+            
         </div>
-    <% } %>
-
-    <!-- Registration Form -->
-    <form action="/auth/register" method="POST">
-        <div>
-            <label for="username">Username</label>
-            <input 
-                type="text" 
-                id="username" 
-                name="username" 
-                required 
-                placeholder="Enter a unique username"
-            >
-        </div>
-
-        <div>
-            <label for="emailAddress">Email Address</label>
-            <input 
-                type="email" 
-                id="emailAddress" 
-                name="emailAddress"
-                required 
-                placeholder="you@example.com"
-            >
-        </div>
-
-        <div>
-            <label for="password">Password</label>
-            <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                required
-                minlength="8"
-                placeholder="Minimum 8 characters"
-            > 
-        </div>
-
-        <button type="submit">Register</button>
-    </form>
-
-    <p>
-        Already have an account?
-        <a href="/login">Log in here</a>
-    </p>
+    </div>
 </div>
 
-<script defer src="/js/pages/register-page.js"></script>
+<!-- Client-side validation -->
+<script>
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            document.getElementById('confirmPassword').focus();
+        }
+    });
+</script>
