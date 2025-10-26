@@ -1,183 +1,326 @@
-// File: public/js/components/profile-component.js
+// ============================================
+// PROFILE-COMPONENT.JS - Profile Component JavaScript
+// ============================================
+// 
+// This file handles:
+// - Edit profile modal
+// - Update profile via API
+// - Delete account modal
+// - Delete account via API
+// - Form validation
+// 
+// Dependencies: modal.js (for modal utilities)
+// ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     
     // ============================================
-    // GET MODAL AND BUTTON ELEMENTS
+    // DOM ELEMENTS
     // ============================================
     
-    const editModal = document.getElementById('edit-modal');
-    const deleteModal = document.getElementById('delete-modal');
-    const logoutModal = document.getElementById('logout-modal');
+    const profileCard = document.getElementById('profile-card');
     
-    const editBtn = document.getElementById('edit-profile-btn');
-    const deleteBtn = document.getElementById('delete-account-btn');
-    const logoutBtn = document.getElementById('logout-btn');
+    // Buttons
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const saveProfileBtn = document.getElementById('save-profile-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-    const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+    // Modals
+    const editProfileModal = document.getElementById('edit-profile-modal');
+    const deleteAccountModal = document.getElementById('delete-account-modal');
     
-    const editForm = document.getElementById('edit-profile-form');
-    const deleteForm = document.getElementById('delete-profile-form');
-    const logoutForm = document.getElementById('logout-profile-form');
-
+    // Forms
+    const editProfileForm = document.getElementById('edit-profile-form');
+    const deleteConfirmationInput = document.getElementById('delete-confirmation-input');
+    
+    // Form inputs
+    const firstNameInput = document.getElementById('edit-firstName');
+    const lastNameInput = document.getElementById('edit-lastName');
+    const phoneNumberInput = document.getElementById('edit-phoneNumber');
+    const bioInput = document.getElementById('edit-bio');
+    
     // ============================================
-    // MODAL CONTROL FUNCTIONS
-    // ============================================
-    
-    const openModal = (modal) => {
-        if (modal) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        }
-    };
-
-    const closeModal = (modal) => {
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = ''; // Restore scrolling
-        }
-    };
-
-    // ============================================
-    // OPEN MODAL EVENT LISTENERS
+    // EDIT PROFILE FUNCTIONALITY
     // ============================================
     
-    if (editBtn) {
-        editBtn.addEventListener('click', () => openModal(editModal));
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => openModal(deleteModal));
-    }
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => openModal(logoutModal));
-    }
-
-    // ============================================
-    // CLOSE MODAL EVENT LISTENERS (Cancel Buttons)
-    // ============================================
-    
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(editModal);
-        });
-    }
-
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(deleteModal);
+    // Open edit profile modal
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            openModal('edit-profile-modal');
         });
     }
     
-    if (cancelLogoutBtn) {
-        cancelLogoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeModal(logoutModal);
+    // Save profile changes
+    if (saveProfileBtn) {
+        saveProfileBtn.addEventListener('click', async () => {
+            await updateProfile();
         });
     }
-
-    // ============================================
-    // CLOSE MODALS ON BACKDROP CLICK
-    // ============================================
     
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            // Only close if clicking directly on the backdrop
-            if (e.target === modal) {
-                closeModal(modal);
-            }
-        });
-    });
-
-    // ============================================
-    // EDIT FORM SUBMISSION (PUT Request)
-    // ============================================
-    
-    if (editForm) {
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Bio character counter
+    if (bioInput) {
+        bioInput.addEventListener('input', () => {
+            const maxLength = 200;
+            const currentLength = bioInput.value.length;
             
-            // Get form data
-            const formData = new FormData(editForm);
-            const data = Object.fromEntries(formData);
-            
-            // Get user ID from the profile details
-            const userId = document.getElementById('profile-details').dataset.userId;
-            const actionUrl = `/api/users/${userId}`;
-
-            try {
-                const response = await fetch(actionUrl, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    alert('Profile updated successfully!');
-                    closeModal(editModal);
-                    
-                    // Reload page to show updated data
-                    window.location.reload();
-                } else {
-                    const errorData = await response.json();
-                    alert(`Update failed: ${errorData.message || 'Server error'}`);
-                }
-            } catch (error) {
-                console.error('Network error during profile update:', error);
-                alert('An unexpected error occurred. Please try again.');
+            if (currentLength > maxLength) {
+                bioInput.value = bioInput.value.substring(0, maxLength);
             }
         });
     }
-
+    
+    /**
+     * Updates user profile via API
+     */
+    async function updateProfile() {
+        try {
+            // Disable save button
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.textContent = 'Saving...';
+            
+            // Gather form data
+            const formData = {
+                firstName: firstNameInput.value.trim() || null,
+                lastName: lastNameInput.value.trim() || null,
+                phoneNumber: phoneNumberInput.value.trim() || null,
+                bio: bioInput.value.trim() || null
+            };
+            
+            // Get user ID from profile card or URL
+            // Assuming user ID is available in a data attribute or globally
+            const userId = profileCard?.dataset.userId || getUserIdFromContext();
+            
+            // Send PUT request
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to update profile');
+            }
+            
+            const updatedUser = await response.json();
+            
+            // Close modal
+            closeModal('edit-profile-modal');
+            
+            // Show success feedback
+            showSuccess('Profile updated successfully!');
+            
+            // Reload page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert(`Failed to update profile: ${error.message}`);
+        } finally {
+            // Re-enable save button
+            saveProfileBtn.disabled = false;
+            saveProfileBtn.textContent = 'Save Changes';
+        }
+    }
+    
     // ============================================
-    // DELETE FORM SUBMISSION (DELETE Request)
+    // DELETE ACCOUNT FUNCTIONALITY
     // ============================================
     
-    if (deleteForm) {
-        deleteForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Open delete account modal
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener('click', () => {
+            openModal('delete-account-modal');
+            // Clear confirmation input
+            if (deleteConfirmationInput) {
+                deleteConfirmationInput.value = '';
+            }
+        });
+    }
+    
+    // Enable/disable delete button based on confirmation
+    if (deleteConfirmationInput) {
+        deleteConfirmationInput.addEventListener('input', () => {
+            const isConfirmed = deleteConfirmationInput.value.toUpperCase() === 'DELETE';
+            confirmDeleteBtn.disabled = !isConfirmed;
+        });
+    }
+    
+    // Confirm delete account
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', async () => {
+            await deleteAccount();
+        });
+    }
+    
+    /**
+     * Deletes user account via API
+     */
+    async function deleteAccount() {
+        try {
+            // Disable button
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = 'Deleting...';
             
             // Get user ID
-            const userId = document.getElementById('profile-details').dataset.userId;
-            const actionUrl = `/api/users/${userId}`;
+            const userId = profileCard?.dataset.userId || getUserIdFromContext();
             
-            try {
-                const response = await fetch(actionUrl, {
-                    method: 'DELETE',
-                });
-
-                if (response.ok) {
-                    alert('Account deleted successfully. You will now be logged out.');
-                    // Redirect to login page
-                    window.location.href = '/login';
-                } else {
-                    const errorData = await response.json();
-                    alert(`Deletion failed: ${errorData.message || 'Server error'}`);
+            // Send DELETE request
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            } catch (error) {
-                console.error('Network error during account deletion:', error);
-                alert('An unexpected error occurred. Please try again.');
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to delete account');
             }
-        });
+            
+            // Close modal
+            closeModal('delete-account-modal');
+            
+            // Show success message
+            alert('Account deleted successfully. You will be redirected to login.');
+            
+            // Redirect to login page
+            window.location.href = '/login';
+            
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            alert(`Failed to delete account: ${error.message}`);
+            
+            // Re-enable button
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = 'Delete Account';
+        }
     }
-
+    
     // ============================================
-    // LOGOUT FORM SUBMISSION (POST Request)
+    // HELPER FUNCTIONS
     // ============================================
     
-    if (logoutForm) {
-        // Logout form uses standard form submission
-        // The server will handle clearing the cookie and redirecting
-        logoutForm.addEventListener('submit', () => {
-            // Let the form submit naturally to /auth/logout
-        });
+    /**
+     * Gets user ID from various sources
+     */
+    function getUserIdFromContext() {
+        // Try to get from data attribute
+        if (profileCard?.dataset.userId) {
+            return profileCard.dataset.userId;
+        }
+        
+        // Try to get from global variable (if set by server)
+        if (typeof window.currentUserId !== 'undefined') {
+            return window.currentUserId;
+        }
+        
+        // Try to get from username in edit form
+        const usernameInput = document.getElementById('edit-username');
+        if (usernameInput?.dataset.userId) {
+            return usernameInput.dataset.userId;
+        }
+        
+        console.error('User ID not found');
+        return null;
     }
+    
+    /**
+     * Shows success message
+     */
+    function showSuccess(message) {
+        // Add success class to profile card
+        profileCard?.classList.add('success');
+        
+        // Show success alert
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success';
+        alert.innerHTML = `
+            <span class="alert-icon">✓</span>
+            <span class="alert-message">${message}</span>
+        `;
+        alert.style.cssText = `
+            position: fixed;
+            top: 5rem;
+            right: 1rem;
+            z-index: 1000;
+            background-color: #f0fff4;
+            border: 1px solid #48bb78;
+            color: #22543d;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(alert);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.3s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+            profileCard?.classList.remove('success');
+        }, 3000);
+    }
+    
+    /**
+     * Validates form data before submission
+     */
+    function validateProfileForm() {
+        let isValid = true;
+        
+        // Validate phone number format if provided
+        if (phoneNumberInput.value.trim()) {
+            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+            if (!phoneRegex.test(phoneNumberInput.value.trim())) {
+                alert('Please enter a valid phone number');
+                phoneNumberInput.focus();
+                isValid = false;
+            }
+        }
+        
+        // Validate bio length
+        if (bioInput.value.length > 200) {
+            alert('Bio must be 200 characters or less');
+            bioInput.focus();
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    // Add validation before save
+    if (saveProfileBtn) {
+        const originalClickHandler = saveProfileBtn.onclick;
+        saveProfileBtn.onclick = async function(e) {
+            if (!validateProfileForm()) {
+                e.preventDefault();
+                return;
+            }
+            if (originalClickHandler) {
+                await originalClickHandler.call(this, e);
+            }
+        };
+    }
+    
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    
+    // Save profile with Ctrl/Cmd + S when modal is open
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            if (editProfileModal && !editProfileModal.classList.contains('hidden')) {
+                e.preventDefault();
+                saveProfileBtn?.click();
+            }
+        }
+    });
+    
 });

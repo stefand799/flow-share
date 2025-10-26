@@ -1,89 +1,146 @@
-<div class="groups-list-container">
-    <h3 class="groups-header">My Groups (<%= groups.length %>)</h3>
+<!-- ============================================
+     GROUP LIST COMPONENT
+     ============================================
+     
+     Displays user's groups as carousel with:
+     - Group cards (clickable to go to dashboard)
+     - Create new group card
+     - Carousel navigation arrows
+     - Empty state when no groups
+     
+     Includes modal for:
+     - Create new group
+============================================ -->
 
-    <div class="carousel-wrapper"> 
+<div class="groups-list-container">
+    
+    <!-- Carousel Wrapper -->
+    <div class="carousel-wrapper">
         
         <!-- Left Arrow -->
-        <button class="carousel-arrow left-arrow" aria-label="Previous Group">
+        <button class="carousel-arrow carousel-arrow-left" id="carousel-left" type="button" aria-label="Previous groups">
             &#10094;
         </button>
-
+        
         <!-- Carousel Container -->
-        <div class="group-carousel" id="groupCarousel">
+        <div class="group-carousel" id="group-carousel">
+            
+            <!-- Create Group Card (Always first) -->
+            <div class="group-card create-group-card" id="create-group-card">
+                <div class="create-icon">➕</div>
+                <h4>Create New Group</h4>
+                <p>Start collaborating with your team</p>
+            </div>
             
             <!-- User's Group Cards -->
             <% if (groups && groups.length > 0) { %>
                 <% groups.forEach(group => { %>
-                    <div class="group-card" 
-                         data-group-id="<%= group.id %>" 
-                         data-group-name="<%= group.name %>"> 
-                        <h4 class="group-card-title"><%= group.name %></h4> 
-                        <p class="group-card-text">Click to view details and tasks</p> 
-                    </div> 
-                <% }); %>
-            <% } else { %>
-                <div class="no-groups-message">
-                    No groups found. Create one to get started!
+                    <div class="group-card" data-group-id="<%= group.id %>">
+                        <div class="group-card-header">
+                            <h4 class="group-card-title"><%= group.name %></h4>
+                        </div>
+                        <div class="group-card-body">
+                            <p class="group-card-description">
+                                <%= group.description || 'No description' %>
+                            </p>
+                            <div class="group-card-meta">
+                                <span class="meta-item">
+                                    <span class="meta-icon">👥</span>
+                                    <span class="meta-text"><%= group._count?.members || 0 %> members</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-icon">📋</span>
+                                    <span class="meta-text"><%= group._count?.tasks || 0 %> tasks</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="group-card-footer">
+                            <span class="view-link">View Dashboard →</span>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <!-- Empty State (shown when no groups) -->
+            <% if (!groups || groups.length === 0) { %>
+                <div class="empty-state-card">
+                    <div class="empty-icon">📭</div>
+                    <h4>No Groups Yet</h4>
+                    <p>Create your first group to get started!</p>
                 </div>
             <% } %>
             
-            <!-- Create New Group Card -->
-            <div class="group-card create-card" id="createGroupCard"> 
-                <span class="create-icon">+</span> 
-                <h4 class="group-card-title">Create New Group</h4> 
-                <p class="group-card-text">Click to start a new group</p> 
-            </div>
-
         </div>
         
         <!-- Right Arrow -->
-        <button class="carousel-arrow right-arrow" aria-label="Next Group">
+        <button class="carousel-arrow carousel-arrow-right" id="carousel-right" type="button" aria-label="Next groups">
             &#10095;
         </button>
-
-    </div> 
+        
+    </div>
+    
+    <!-- Carousel Indicators (dots) -->
+    <div class="carousel-indicators" id="carousel-indicators"></div>
+    
 </div>
 
-<!-- Create Group Modal -->
+<!-- ============================================
+     CREATE GROUP MODAL
+============================================ -->
 <div id="create-group-modal" class="modal hidden">
-    <div class="modal-content"> 
-        <h2 class="modal-title">Create New Group</h2>
-
-        <form id="create-group-form" action="/api/groups/create" method="POST">
-            <div class="form-content"> 
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Group</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="create-group-form">
                 
+                <!-- Group Name -->
                 <div class="form-group">
-                    <label for="group-name">Group Name</label>
+                    <label for="group-name">Group Name *</label>
                     <input 
                         type="text" 
                         id="group-name" 
-                        name="name" 
+                        name="name"
+                        class="form-input"
+                        placeholder="Enter group name"
                         required
-                        placeholder="e.g., Roommates Expenses"
+                        minlength="3"
+                        maxlength="50"
+                        autofocus
                     >
+                    <small class="form-hint">3-50 characters</small>
+                    <small class="form-error" id="group-name-error"></small>
                 </div>
-
+                
+                <!-- Group Description -->
                 <div class="form-group">
-                    <label for="group-description">Description (Optional)</label>
+                    <label for="group-description">Description</label>
                     <textarea 
                         id="group-description" 
-                        name="description" 
+                        name="description"
+                        class="form-input"
                         rows="3"
-                        placeholder="A brief description of the group's purpose"
+                        placeholder="What is this group about?"
+                        maxlength="200"
                     ></textarea>
+                    <small class="form-hint">Optional, maximum 200 characters</small>
                 </div>
-            </div>
-
-            <div class="button-group">
-                <button type="button" id="cancel-group-create-btn" class="btn-secondary">
-                    Cancel
-                </button>
-                <button type="submit" class="btn-primary">
-                    Create Group
-                </button>
-            </div>
-        </form>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="create-group-modal" type="button">
+                Cancel
+            </button>
+            <button id="create-group-btn" class="btn btn-primary" type="button">
+                Create Group
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Component-specific JavaScript -->
 <script src="/js/components/group-list-component.js"></script>

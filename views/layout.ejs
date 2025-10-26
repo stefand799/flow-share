@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
+    <!-- Dynamic Page Title -->
     <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FlowShare' %> | FlowShare</title>
     
     <!-- CSS Stylesheets -->
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/pages.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/modals.css">
@@ -23,7 +25,7 @@
     <!-- ============================================ -->
     <% if (typeof user !== 'undefined' && user) { %>
         <!-- Authenticated User Navigation -->
-        <nav class="navbar">
+        <nav class="navbar" id="main-navbar">
             <div class="navbar-container">
                 <!-- Logo -->
                 <div class="navbar-brand">
@@ -52,7 +54,7 @@
                 <!-- User Menu -->
                 <div class="navbar-user">
                     <span class="user-name"><%= user.username %></span>
-                    <button id="logout-btn" class="btn-logout" title="Logout">
+                    <button id="logout-btn" class="btn-logout" type="button" title="Logout">
                         Logout
                     </button>
                 </div>
@@ -60,7 +62,7 @@
         </nav>
     <% } else { %>
         <!-- Public Navigation (Login/Register pages) -->
-        <nav class="navbar navbar-public">
+        <nav class="navbar navbar-public" id="public-navbar">
             <div class="navbar-container">
                 <div class="navbar-brand">
                     <span>FlowShare</span>
@@ -72,7 +74,7 @@
     <!-- ============================================ -->
     <!-- MAIN CONTENT -->
     <!-- ============================================ -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <%- body %>
     </main>
     
@@ -91,21 +93,19 @@
     
     <!-- Logout Confirmation Modal -->
     <% if (typeof user !== 'undefined' && user) { %>
-    <div id="logout-modal" class="modal">
+    <div id="logout-modal" class="modal hidden">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Confirm Logout</h3>
-                <button class="modal-close" data-modal="logout-modal">&times;</button>
+                <button class="modal-close" data-modal="logout-modal" type="button">&times;</button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to logout?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-close-modal="logout-modal">Cancel</button>
-                <form action="/auth/logout" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Logout</button>
-                </form>
+                <button class="btn btn-secondary" data-close-modal="logout-modal" type="button">Cancel</button>
+                <button id="confirm-logout-btn" class="btn btn-danger" type="button">Logout</button>
             </div>
         </div>
     </div>
@@ -115,31 +115,9 @@
     <!-- JAVASCRIPT -->
     <!-- ============================================ -->
     
-    <!-- Core JavaScript -->
-    <script src="/js/main.js"></script>
-    <script src="/js/modals.js"></script>
-    
-    <!-- Conditional JavaScript based on page context -->
-    <% if (typeof user !== 'undefined' && user) { %>
-        <% if (typeof group !== 'undefined' && group) { %>
-            <!-- Dashboard page scripts -->
-            <script src="/js/dashboard.js"></script>
-            <script src="/js/members.js"></script>
-            <script src="/js/tasks.js"></script>
-            <script src="/js/expenses.js"></script>
-        <% } else { %>
-            <!-- Home page scripts -->
-            <script src="/js/profile.js"></script>
-            <script src="/js/groups.js"></script>
-        <% } %>
-        
-        <!-- Global logout handler -->
-        <script>
-            document.getElementById('logout-btn')?.addEventListener('click', () => {
-                document.getElementById('logout-modal').classList.add('active');
-            });
-        </script>
-    <% } %>
+    <!-- Core JavaScript (always loaded) -->
+    <script src="/js/utils/modal.js"></script>
+    <script src="/js/layout.js"></script>
     
 </body>
 </html>

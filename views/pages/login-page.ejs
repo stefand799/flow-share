@@ -1,4 +1,17 @@
-<!-- login-page.ejs -->
+<!-- ============================================
+     LOGIN PAGE
+     ============================================
+     
+     This page allows users to login with:
+     - Username, email, or phone
+     - Password
+     
+     On success: Redirects to /home
+     On error: Shows error message
+     
+     Can navigate to /register to create account
+============================================ -->
+
 <div class="auth-page">
     <div class="auth-container">
         <div class="auth-card">
@@ -9,45 +22,54 @@
                 <p>Login to your FlowShare account</p>
             </div>
             
-            <!-- Error Alert -->
+            <!-- Error Alert (shown when login fails) -->
             <% if (typeof error !== 'undefined' && error) { %>
-            <div class="alert alert-error">
-                <span>⚠️</span>
-                <span><%= error %></span>
+            <div class="alert alert-error" id="error-alert">
+                <span class="alert-icon">⚠️</span>
+                <span class="alert-message"><%= error %></span>
             </div>
             <% } %>
             
             <!-- Login Form -->
-            <form action="/auth/login" method="POST" class="auth-form">
+            <form action="/auth/login" method="POST" class="auth-form" id="login-form">
                 
-                <!-- Credentials (username, email, or phone) -->
+                <!-- Credentials Field (username, email, or phone) -->
                 <div class="form-group">
                     <label for="credentials">Username, Email, or Phone *</label>
                     <input 
                         type="text" 
                         id="credentials" 
                         name="credentials" 
+                        class="form-input"
                         placeholder="Enter your username, email, or phone"
                         value="<%= typeof credentials !== 'undefined' ? credentials : '' %>"
                         required
                         autofocus
                     >
+                    <small class="form-error" id="credentials-error"></small>
                 </div>
                 
-                <!-- Password -->
+                <!-- Password Field -->
                 <div class="form-group">
                     <label for="password">Password *</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Enter your password"
-                        required
-                    >
+                    <div class="input-with-icon">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input"
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                    <small class="form-error" id="password-error"></small>
                 </div>
                 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
                     Login
                 </button>
                 
@@ -68,3 +90,6 @@
         </div>
     </div>
 </div>
+
+<!-- Page-specific JavaScript -->
+<script src="/js/pages/login-page.js"></script>

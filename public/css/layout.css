@@ -1,42 +1,264 @@
-/* Global styles */
-html, body {
-    height: 100%;
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #f7f9fb;
-}
+/* ============================================
+   LAYOUT.CSS - Main Layout Structure Styles
+   ============================================
+   
+   This file contains styles for:
+   - Navigation bar (authenticated and public)
+   - Main content wrapper
+   - Footer
+   - Overall page structure
+   
+   Does NOT contain:
+   - Page-specific styles (see pages.css)
+   - Component-specific styles (see components.css)
+   - Modal styles (see modals.css)
+============================================ */
 
-/* Center auth pages (login/register) */
-main {
+/* ============================================
+   BODY AND MAIN STRUCTURE
+============================================ */
+
+body {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     min-height: 100vh;
-    padding: 2rem 1rem;
-}
-
-/* Global focus styles */
-*:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
-}
-
-/* Error message styling */
-.error-message {
-    background-color: #fee2e2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-}
-
-.error-message p:first-child {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.error-message p:last-child {
     margin: 0;
+    padding: 0;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem 0.5rem;
+    }
+}
+
+/* ============================================
+   NAVIGATION BAR - AUTHENTICATED
+============================================ */
+
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Brand/Logo */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.navbar-brand a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.navbar-brand a:hover {
+    opacity: 0.9;
+}
+
+/* Navigation Links (Center) */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+}
+
+.nav-current {
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+/* User Menu (Right) */
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.btn-logout {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   NAVIGATION BAR - PUBLIC (Login/Register)
+============================================ */
+
+.navbar-public {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-public .navbar-brand span {
+    color: white;
+}
+
+/* ============================================
+   RESPONSIVE NAVIGATION
+============================================ */
+
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 0 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .navbar-nav {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        padding-top: 0.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .navbar-user {
+        gap: 0.75rem;
+    }
+
+    .user-name {
+        font-size: 0.85rem;
+    }
+
+    .btn-logout {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-container {
+        padding: 0 0.75rem;
+    }
+
+    .user-name {
+        display: none; /* Hide username on very small screens */
+    }
+}
+
+/* ============================================
+   FOOTER
+============================================ */
+
+.footer {
+    background-color: #1a202c;
+    color: #a0aec0;
+    padding: 1.5rem 0;
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.footer p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 1rem 0;
+        font-size: 0.85rem;
+    }
+
+    .footer-container {
+        padding: 0 1rem;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES FOR LAYOUT
+============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
 }

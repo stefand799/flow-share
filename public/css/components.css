@@ -1,0 +1,19 @@
+/* ============================================
+   COMPONENTS.CSS - Aggregated Component Styles
+   ============================================
+   
+   This file imports all component-specific CSS files.
+   Add new component CSS imports here as you create them.
+============================================ */
+
+/* Home Page Components */
+@import url('components/profile-component.css');
+@import url('components/group-list-component.css');
+
+/* Dashboard Page Components */
+/* Add when created:
+@import url('components/group-component.css');
+@import url('components/members-component.css');
+@import url('components/kanban-component.css');
+@import url('components/expenses-component.css');
+*/

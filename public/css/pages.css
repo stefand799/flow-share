@@ -1,0 +1,17 @@
+/* ============================================
+   PAGES.CSS - Aggregated Page Styles
+   ============================================
+   
+   This file imports all page-specific CSS files.
+   Add new page CSS imports here as you create them.
+============================================ */
+
+/* Authentication Pages */
+@import url('pages/login-page.css');
+@import url('pages/register-page.css');
+
+/* Protected Pages */
+@import url('pages/home-page.css');
+/* Add more page imports as needed:
+@import url('pages/dashboard-page.css');
+*/

@@ -1,135 +1,343 @@
 /* ============================================
+   PROFILE-COMPONENT.CSS - Profile Card Styles
+   ============================================
+   
+   This file contains styles for:
+   - Profile card layout
+   - Avatar and user info
+   - Profile details
+   - Action buttons
+   - Edit/Delete modals
+============================================ */
+
+/* ============================================
    PROFILE CARD
-   ============================================ */
+============================================ */
 
 .profile-card {
-    background: #ffffff;
-    padding: 2rem;
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
 }
 
-.profile-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #1f2937;
+.profile-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   PROFILE HEADER
+============================================ */
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
     margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e5e7eb;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.avatar-initials {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+}
+
+.profile-name h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.25rem 0;
+}
+
+.full-name {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0;
 }
 
 /* ============================================
    PROFILE DETAILS
-   ============================================ */
+============================================ */
 
 .profile-details {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .detail-item {
-    padding: 1rem 0;
-    border-bottom: 1px dashed #e5e7eb;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f7fafc;
 }
 
 .detail-item:last-child {
     border-bottom: none;
-    padding-bottom: 0;
+}
+
+.detail-item.bio {
+    align-items: flex-start;
+}
+
+.detail-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.detail-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .detail-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #6b7280;
-    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .detail-value {
-    font-size: 1.05rem;
-    color: #1f2937;
-    font-weight: 500;
+    font-size: 0.95rem;
+    color: #2d3748;
+    word-break: break-word;
 }
 
-.detail-bio {
-    font-style: italic;
-    font-weight: 400;
-    color: #4b5563;
+.bio-text {
+    line-height: 1.6;
+    white-space: pre-wrap;
 }
 
 /* ============================================
    PROFILE ACTIONS
-   ============================================ */
+============================================ */
 
 .profile-actions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    padding-top: 1.5rem;
-    border-top: 2px solid #e5e7eb;
 }
 
-@media (min-width: 640px) {
-    .profile-actions {
-        flex-direction: row;
+.profile-actions .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+}
+
+/* ============================================
+   EDIT PROFILE MODAL SPECIFIC
+============================================ */
+
+#edit-profile-modal .form-group {
+    margin-bottom: 1.25rem;
+}
+
+#edit-profile-modal .form-input[readonly],
+#edit-profile-modal .form-input:disabled {
+    background-color: #f7fafc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#edit-profile-modal textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+    max-height: 200px;
+}
+
+/* ============================================
+   DELETE ACCOUNT MODAL SPECIFIC
+============================================ */
+
+.warning-text {
+    color: #c53030;
+    font-size: 0.95rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.warning-text strong {
+    font-weight: 700;
+}
+
+.warning-list {
+    margin: 0 0 1.5rem 0;
+    padding-left: 1.5rem;
+    color: #4a5568;
+}
+
+.warning-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.confirmation-prompt {
+    font-size: 0.95rem;
+    color: #2d3748;
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+}
+
+.confirmation-prompt strong {
+    color: #e53e3e;
+    font-family: 'Courier New', monospace;
+}
+
+#delete-confirmation-input {
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+}
+
+#confirm-delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#confirm-delete-btn:not(:disabled) {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
     }
 }
 
-.profile-actions button {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
+
+@media (max-width: 768px) {
+    .profile-card {
+        padding: 1.25rem;
+    }
+    
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .avatar-initials {
+        font-size: 1.75rem;
+    }
+    
+    .profile-name h3 {
+        font-size: 1.375rem;
+    }
+    
+    .full-name {
+        font-size: 0.95rem;
+    }
+    
+    .detail-value {
+        font-size: 0.9rem;
+    }
+    
+    .profile-actions .btn {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card {
+        padding: 1rem;
+    }
+    
+    .profile-header {
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .avatar-initials {
+        font-size: 1.5rem;
+    }
+    
+    .profile-name h3 {
+        font-size: 1.25rem;
+    }
+    
+    .detail-item {
+        padding: 0.625rem 0;
+    }
+    
+    .detail-icon {
+        font-size: 1.125rem;
+    }
 }
 
 /* ============================================
-   MODAL SPECIFIC STYLES
-   ============================================ */
+   ANIMATION STATES
+============================================ */
 
-.modal-small {
-    max-width: 400px !important;
+.profile-card.updating {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
-.modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e5e7eb;
+.profile-card.success {
+    animation: successFlash 0.6s ease-in-out;
 }
 
-.modal-title-danger {
-    color: #dc2626;
-}
-
-.modal-message {
-    font-size: 1rem;
-    color: #4b5563;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+@keyframes successFlash {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(72, 187, 120, 0.6);
+    }
 }
 
 /* ============================================
-   FORM CONTENT
-   ============================================ */
+   LOADING STATE
+============================================ */
 
-.form-content {
+.profile-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: center;
 }
 
-input[readonly],
-input[disabled] {
-    background-color: #f3f4f6;
-    cursor: not-allowed;
-    opacity: 0.7;
+.profile-card {
+    position: relative;
 }
