@@ -3,42 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle || 'FlowShare' %></title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
-    <!-- ============================================
-         GLOBAL STYLES
-         ============================================ -->
-    <link rel="stylesheet" href="/css/layout.css">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FlowShare' %> | FlowShare</title>
     
-    <!-- ============================================
-         PAGE STYLES
-         ============================================ -->
-    <!-- Auth Pages (Login/Register) -->
-    <link rel="stylesheet" href="/css/pages/login-page.css">
-    <link rel="stylesheet" href="/css/pages/register-page.css">
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pages.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/modals.css">
     
-    <!-- Dashboard Pages -->
-    <link rel="stylesheet" href="/css/pages/main-page.css">
-    <link rel="stylesheet" href="/css/pages/group-page.css">
-    
-    <!-- ============================================
-         COMPONENT STYLES
-         ============================================ -->
-    <!-- Profile Component -->
-    <link rel="stylesheet" href="/css/components/profile-component.css">
-    
-    <!-- Group Components -->
-    <link rel="stylesheet" href="/css/components/group-list-component.css">
-    <link rel="stylesheet" href="/css/components/group-component.css">
-    <link rel="stylesheet" href="/css/components/members-component.css">
-    
-    <!-- Other Components -->
-    <link rel="stylesheet" href="/css/components/kanban-component.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
-<body>
-    <main>
-        <!-- Page content gets injected here -->
+<body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
+    
+    <!-- ============================================ -->
+    <!-- NAVIGATION BAR (Conditional) -->
+    <!-- ============================================ -->
+    <% if (typeof user !== 'undefined' && user) { %>
+        <!-- Logged-in navigation bar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <!-- Logo/Brand -->
+                <div class="navbar-brand">
+                    <a href="/home">
+                        <h1>FlowShare</h1>
+                    </a>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="navbar-links">
+                    <% if (typeof group !== 'undefined' && group) { %>
+                        <!-- Dashboard page navigation -->
+                        <a href="/home" class="nav-link">
+                            <span class="icon">🏠</span>
+                            <span>Home</span>
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <span class="nav-current">
+                            <span class="icon">👥</span>
+                            <span><%= group.name %></span>
+                        </span>
+                    <% } else { %>
+                        <!-- Home page navigation -->
+                        <span class="nav-current">
+                            <span class="icon">🏠</span>
+                            <span>Home</span>
+                        </span>
+                    <% } %>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="navbar-user">
+                    <div class="user-info">
+                        <span class="user-name"><%= user.username %></span>
+                    </div>
+                    <button id="navbar-logout-btn" class="btn-icon" title="Logout">
+                        <span class="icon">🚪</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    <% } else { %>
+        <!-- Public navigation bar (login/register pages) -->
+        <nav class="navbar navbar-public">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <h1>FlowShare</h1>
+                </div>
+            </div>
+        </nav>
+    <% } %>
+    
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT AREA -->
+    <!-- ============================================ -->
+    <main class="main-content">
+        <!-- Page content will be injected here by EJS -->
         <%- body %>
     </main>
+    
+    <!-- ============================================ -->
+    <!-- FOOTER (Optional) -->
+    <!-- ============================================ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2024 FlowShare. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- ============================================ -->
+    <!-- GLOBAL MODALS -->
+    <!-- ============================================ -->
+    
+    <!-- Logout Confirmation Modal (Global) -->
+    <% if (typeof user !== 'undefined' && user) { %>
+    <div id="logout-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Logout</h3>
+                <button class="modal-close" data-modal="logout-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-modal="logout-modal">Cancel</button>
+                <form action="/auth/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================ -->
+    
+    <!-- Core JavaScript -->
+    <script src="/js/main.js"></script>
+    <script src="/js/modals.js"></script>
+    
+    <!-- Page-specific JavaScript (conditional) -->
+    <% if (typeof user !== 'undefined' && user) { %>
+        <!-- Logged-in user scripts -->
+        <script src="/js/profile.js"></script>
+        <script src="/js/groups.js"></script>
+        
+        <% if (typeof group !== 'undefined' && group) { %>
+            <!-- Dashboard page scripts -->
+            <script src="/js/members.js"></script>
+            <script src="/js/dashboard.js"></script>
+            <script src="/js/tasks.js"></script>
+            <script src="/js/expenses.js"></script>
+        <% } else { %>
+            <!-- Home page scripts -->
+            <script src="/js/carousel.js"></script>
+        <% } %>
+    <% } %>
+    
+    <!-- Global logout button handler -->
+    <% if (typeof user !== 'undefined' && user) { %>
+    <script>
+        // Navbar logout button opens confirmation modal
+        document.getElementById('navbar-logout-btn')?.addEventListener('click', () => {
+            document.getElementById('logout-modal').classList.add('active');
+        });
+    </script>
+    <% } %>
+    
 </body>
 </html>

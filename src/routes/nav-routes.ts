@@ -5,30 +5,52 @@ import { authenticate } from "../middleware/auth-middleware";
 const router = Router();
 
 // ============================================
-// PUBLIC ROUTES
+// PUBLIC ROUTES (No Authentication Required)
 // ============================================
 
-// Login page
-router.get("/login", NavController.handleLogin);
+/**
+ * GET /login
+ * Render login page
+ * If already authenticated, redirect to /home
+ */
+router.get("/login", NavController.handleLoginPage);
 
-// Register page
-router.get("/register", NavController.handleRegister);
+/**
+ * GET /register
+ * Render registration page
+ * If already authenticated, redirect to /home
+ */
+router.get("/register", NavController.handleRegisterPage);
 
 // ============================================
-// PROTECTED ROUTES (Require Authentication)
+// PROTECTED ROUTES (Authentication Required)
 // ============================================
 
-// Main dashboard (after login)
-router.get("/dashboard", authenticate, NavController.handleDashboard);
-router.get("/")
-// View specific group (partial render for dynamic content)
-router.get("/groups/:groupId", authenticate, NavController.handleGroupView);
-router.get("/component/group/:groupId", authenticate, NavController.handleGroupView);
+/**
+ * GET /home
+ * Render user home page with profile and groups list
+ * Requires: authenticate middleware
+ */
+router.get("/home", authenticate, NavController.handleHomePage);
+
+/**
+ * GET /dashboard/:groupId
+ * Render group dashboard with details, members, kanban, and expenses
+ * Requires: authenticate middleware
+ * Validates: user is member of the group
+ */
+router.get("/dashboard/:groupId", authenticate, NavController.handleDashboardPage);
+
 // ============================================
-// REDIRECTS
+// ROOT REDIRECT
 // ============================================
 
-// Root path redirects to dashboard
-router.get("/", (req, res) => res.redirect("/dashboard"));
+/**
+ * GET /
+ * Root path - redirects based on authentication status
+ * - If authenticated: redirect to /home
+ * - If not authenticated: redirect to /login
+ */
+router.get("/", NavController.handleRootRedirect);
 
 export default router;
