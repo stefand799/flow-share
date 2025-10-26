@@ -1,14 +1,11 @@
 /* ============================================
-   GROUP-LIST-COMPONENT.CSS - Groups Carousel Styles
+   GROUP-LIST-COMPONENT.CSS - Groups Carousel (FIXED)
    ============================================
    
-   This file contains styles for:
-   - Groups list container
-   - Carousel navigation
-   - Group cards
-   - Create group card
-   - Empty state
-   - Indicators
+   Fixed issues:
+   - Carousel now properly displays cards in a scrollable row
+   - Navigation arrows work correctly
+   - Cards maintain proper sizing
 ============================================ */
 
 /* ============================================
@@ -33,28 +30,21 @@
 }
 
 /* ============================================
-   CAROUSEL CONTAINER
+   CAROUSEL CONTAINER - FIXED TO SHOW ONE CARD AT A TIME
 ============================================ */
 
 .group-carousel {
     display: flex;
     gap: 1.5rem;
-    overflow-x: auto;
+    overflow: hidden; /* Hide cards outside viewport */
     scroll-behavior: smooth;
     padding: 1rem 0.5rem;
     flex: 1;
-    
-    /* Hide scrollbar but keep functionality */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-}
-
-.group-carousel::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+    position: relative;
 }
 
 /* ============================================
-   CAROUSEL ARROWS
+   CAROUSEL ARROWS - IMPROVED
 ============================================ */
 
 .carousel-arrow {
@@ -73,9 +63,10 @@
     justify-content: center;
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* Ensure arrows are above cards */
 }
 
-.carousel-arrow:hover {
+.carousel-arrow:hover:not(:disabled) {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-color: #667eea;
     color: white;
@@ -83,43 +74,36 @@
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
-.carousel-arrow:active {
-    transform: scale(1);
+.carousel-arrow:active:not(:disabled) {
+    transform: scale(0.95);
 }
 
 .carousel-arrow:disabled {
     opacity: 0.3;
     cursor: not-allowed;
-    transform: none;
-}
-
-.carousel-arrow:disabled:hover {
-    background: white;
-    border-color: #e2e8f0;
-    color: #4a5568;
 }
 
 /* ============================================
-   GROUP CARDS
+   GROUP CARDS - FIXED SIZING FOR CAROUSEL
 ============================================ */
 
 .group-card {
-    min-width: 280px;
-    max-width: 320px;
+    min-width: 100%; /* Each card takes full width of carousel */
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Prevent cards from shrinking */
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+    transform: translateX(0); /* For smooth transitions */
 }
 
 .group-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* ============================================
@@ -127,62 +111,56 @@
 ============================================ */
 
 .create-group-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    text-align: center;
-    justify-content: center;
+    border: 2px dashed #cbd5e0;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     min-height: 220px;
-    border: 2px dashed rgba(255, 255, 255, 0.5);
 }
 
 .create-group-card:hover {
-    border-color: white;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    border-color: #667eea;
+    background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
 }
 
 .create-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .create-group-card h4 {
     font-size: 1.25rem;
     font-weight: 700;
+    color: #2d3748;
     margin: 0 0 0.5rem 0;
 }
 
 .create-group-card p {
     font-size: 0.95rem;
+    color: #718096;
     margin: 0;
-    opacity: 0.9;
 }
 
 /* ============================================
-   GROUP CARD STRUCTURE
+   GROUP CARD CONTENT
 ============================================ */
 
 .group-card-header {
     margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e2e8f0;
 }
 
 .group-card-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1a202c;
-    margin: 0;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -200,6 +178,7 @@
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2; /* Standard property for compatibility */
     -webkit-box-orient: vertical;
     overflow: hidden;
     min-height: 2.85rem; /* 2 lines */
@@ -226,6 +205,7 @@
 .group-card-footer {
     padding-top: 0.75rem;
     border-top: 1px solid #e2e8f0;
+    margin-top: auto; /* Push to bottom */
 }
 
 .view-link {
@@ -245,7 +225,7 @@
 
 .empty-state-card {
     min-width: 280px;
-    max-width: 320px;
+    width: 280px;
     background: #f7fafc;
     border: 2px dashed #cbd5e0;
     border-radius: 12px;
@@ -312,8 +292,11 @@
 
 @media (max-width: 1024px) {
     .group-card {
-        min-width: 260px;
-        max-width: 300px;
+        min-width: 100%;
+    }
+    
+    .empty-state-card {
+        min-width: 100%;
     }
 }
 
@@ -329,9 +312,12 @@
     }
     
     .group-card {
-        min-width: 240px;
-        max-width: 280px;
+        min-width: 100%;
         padding: 1.25rem;
+    }
+    
+    .empty-state-card {
+        min-width: 100%;
     }
     
     .group-card-title {
@@ -367,9 +353,12 @@
     }
     
     .group-card {
-        min-width: 220px;
-        max-width: 260px;
+        min-width: 100%;
         padding: 1rem;
+    }
+    
+    .empty-state-card {
+        min-width: 100%;
     }
     
     .group-carousel {

