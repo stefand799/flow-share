@@ -4,6 +4,11 @@ const prisma = new PrismaClient();
 
 type ExpenseInput = Omit<Expense, 'id' | 'createdAt' | 'updatedAt' | 'Contributions'>;
 
+/**
+ * Create a new expense
+ * @param expenseData - Expense data including title, value, currency, etc.
+ * @returns Created expense, or null if creation fails
+ */
 export const createExpense = async (expenseData: ExpenseInput): Promise<Expense | null> => {
     try {
         const createdExpense = await prisma.expense.create({
@@ -18,6 +23,7 @@ export const createExpense = async (expenseData: ExpenseInput): Promise<Expense 
                 recurrenceInterval: expenseData.recurrenceInterval,
             },
         });
+
         return createdExpense;
     } catch (error) {
         console.error("Prisma Error in createExpense:", error);
@@ -25,14 +31,25 @@ export const createExpense = async (expenseData: ExpenseInput): Promise<Expense 
     }
 };
 
-export const updateExpense = async (expenseId: number, dataToUpdate: Partial<ExpenseInput>): Promise<Expense | null> => {
+/**
+ * Update an expense's information
+ * @param expenseId - The expense's ID
+ * @param dataToUpdate - Partial expense data to update
+ * @returns Updated expense, or null if expense doesn't exist
+ */
+export const updateExpense = async (
+    expenseId: number, 
+    dataToUpdate: Partial<ExpenseInput>
+): Promise<Expense | null> => {
     try {
         const updatedExpense = await prisma.expense.update({
             where: { id: expenseId },
             data: dataToUpdate,
         });
+
         return updatedExpense;
     } catch (error: any) {
+        // P2025 is Prisma's code for "Record to update not found"
         if (error.code === 'P2025') {
             return null;
         }
@@ -41,12 +58,20 @@ export const updateExpense = async (expenseId: number, dataToUpdate: Partial<Exp
     }
 };
 
-
+/**
+ * Delete an expense by its ID
+ * @param expenseId - The expense's ID
+ * @returns true if deleted successfully, false if expense doesn't exist
+ */
 export const deleteExpense = async (expenseId: number): Promise<boolean> => {
     try {
-        await prisma.expense.delete({ where: { id: expenseId } });
+        await prisma.expense.delete({ 
+            where: { id: expenseId } 
+        });
+
         return true;
     } catch (error: any) {
+        // P2025 is Prisma's code for "Record to delete does not exist"
         if (error.code === 'P2025') {
             return false;
         }
@@ -55,12 +80,33 @@ export const deleteExpense = async (expenseId: number): Promise<boolean> => {
     }
 };
 
+/**
+ * Get all expenses for a specific group
+ * @param groupId - The group's ID
+ * @returns Array of expenses ordered by creation date (newest first)
+ */
 export const getAllExpenses = async (groupId: number): Promise<Expense[]> => {
     const expenses = await prisma.expense.findMany({
-        where: { groupId: groupId },
+        where: { 
+            groupId: groupId 
+        },
         orderBy: {
-            createdAt: 'desc', 
+            createdAt: 'desc',
         }
     });
+
     return expenses;
+};
+
+/**
+ * Get a specific expense by ID
+ * @param expenseId - The expense's ID
+ * @returns Expense object, or null if not found
+ */
+export const getExpenseById = async (expenseId: number): Promise<Expense | null> => {
+    const expense = await prisma.expense.findUnique({
+        where: { id: expenseId }
+    });
+
+    return expense;
 };

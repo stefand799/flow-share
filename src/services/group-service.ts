@@ -1,14 +1,25 @@
-import { PrismaClient, Group, GroupMember, User} from "../generated/prisma";
+import { PrismaClient, Group, GroupMember, User } from "../generated/prisma";
 
 const prisma = new PrismaClient();
+
 type EnrichedGroupMember = GroupMember & { user: User };
 
+/**
+ * Create a new group
+ * @param group - Group data including name and description
+ * @returns Created group, or null if group name already exists
+ */
 export const createGroup = async (group: Group): Promise<Group | null> => {
+    // Check if group name already exists
+    const existingGroup = await prisma.group.findFirst({ 
+        where: { name: group.name } 
+    });
 
-    const existingGroup = await prisma.group.findFirst({where: {name: group.name}});
-    
-    if (existingGroup) return null; 
+    if (existingGroup) {
+        return null;
+    }
 
+    // Create the new group
     const createdGroup = await prisma.group.create({
         data: {
             name: group.name,
@@ -16,115 +27,89 @@ export const createGroup = async (group: Group): Promise<Group | null> => {
         },
     });
 
-    return createdGroup; 
+    return createdGroup;
 };
 
+/**
+ * Update a group's information
+ * @param group - Group object with updated fields
+ * @returns Updated group, or null if group doesn't exist
+ */
 export const updateGroup = async (group: Group): Promise<Group | null> => {
-    const existingGroup = await prisma.group.findFirst({where: {id:group.id}});
-    if(!existingGroup) return null;
+    // Check if group exists
+    const existingGroup = await prisma.group.findUnique({ 
+        where: { id: group.id } 
+    });
 
+    if (!existingGroup) {
+        return null;
+    }
+
+    // Update the group
     const updatedGroup = await prisma.group.update({
-        where: {id: group.id},
-        data:{
-            name : group.name,
+        where: { id: group.id },
+        data: {
+            name: group.name,
             description: group.description,
             whatsappGroupUrl: group.whatsappGroupUrl
         }
     });
+
     return updatedGroup;
 };
 
+/**
+ * Delete a group by its ID
+ * @param group - Group object with ID
+ * @returns true if deleted successfully, false if group doesn't exist
+ */
 export const deleteGroup = async (group: Group): Promise<boolean> => {
-    const existingGroup = await prisma.group.findFirst({where: {id:group.id}});
-    if(!existingGroup) return false;
-    
-    await prisma.group.delete({where: {id: group.id}});
+    // Check if group exists
+    const existingGroup = await prisma.group.findUnique({ 
+        where: { id: group.id } 
+    });
+
+    if (!existingGroup) {
+        return false;
+    }
+
+    // Delete the group
+    await prisma.group.delete({ 
+        where: { id: group.id } 
+    });
+
     return true;
 };
 
-export const addMember = async (member: GroupMember): Promise<GroupMember | null> => {
-    const existingMember = await prisma.groupMember.findFirst({where: {userId: member.userId, groupId: member.groupId}});
-    if(existingMember) return null;
-
-    const createdMember = await prisma.groupMember.create({
-        data:{
-            userId: member.userId,
-            groupId: member.groupId,
-        }
-    });
-    return createdMember;
-};
-
-export const removeMember = async (member: GroupMember): Promise<boolean> =>{
-    const existingMember = await prisma.groupMember.findFirst({where: {id: member.id},});
-    if(!existingMember) return false;
-
-    await prisma.groupMember.delete({where: {id: member.id}});
-    return true;
-};
-
-export const promoteAdmin = async (member: GroupMember): Promise<GroupMember | null> => {
-    const existingMember = await prisma.groupMember.findFirst({where: {id: member.id}});
-    if(!existingMember) return null;
-
-    const promotedMember = await prisma.groupMember.update({
-        where: {id: member.id},
-        data:{
-            isAdmin : true
-        }
-    });
-    return promotedMember;
-};
-
-export const demoteAdmin = async (member: GroupMember): Promise<GroupMember | null> => {
-    const existingMember = await prisma.groupMember.findFirst({where: {id: member.id}});
-    if(!existingMember) return null;
-
-    const demotedMember = await prisma.groupMember.update({
-        where: {id: member.id},
-        data:{
-            isAdmin : false
-        }
-    });
-    return demotedMember;
-};
-
-export const getGroups = async (user: User): Promise<Group[]> => {
+/**
+ * Get all groups that a user is a member of
+ * @param user - User object
+ * @returns Array of groups
+ */
+export const getGroupsOfUser = async (user: User): Promise<Group[]> => {
     const groupMemberships = await prisma.groupMember.findMany({
         where: {
             userId: user.id,
         },
         include: {
-            group: true, 
+            group: true,
         },
     });
 
     const groups = groupMemberships.map(membership => membership.group);
-
     return groups;
 };
 
-
-export const getGroupMembers = async (groupId: number): Promise<EnrichedGroupMember[]> => {
-    const groupMemberships = await prisma.groupMember.findMany({
-        where: {
-            groupId: groupId,
-        },
-        include: {
-            user: true,
-        },
-    });
-
-    return groupMemberships as EnrichedGroupMember[];
-};
-
+/**
+ * Get a specific group by its ID
+ * @param groupId - The group's ID
+ * @returns Group object, or null if not found
+ */
 export const getGroupById = async (groupId: number): Promise<Group | null> => {
-    // Corrected the variable name from 'groupid' to 'groupId'
-    const group = await prisma.group.findFirst({
-        where: { id: groupId }, // Correct capitalization
+    const group = await prisma.group.findUnique({
+        where: { id: groupId },
     });
 
-    // Explicitly return the found group or null if not found
     return group;
 };
 

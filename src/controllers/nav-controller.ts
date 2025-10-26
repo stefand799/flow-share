@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { User, Group } from "../generated/prisma";
-import * as GroupService from "../services/group-service";
-import * as TaskService from "../services/task-service";
-import * as ExpenseService from "../services/expense-service";
+import { User, Group, GroupMember, Task } from "../generated/prisma";
 // Authenticated request type
 interface AuthenticatedRequest extends Request {
     user?: Omit<User, 'passwordHash'>;
-}
+    groups: Group[];
+    group: Group;
+    members: GroupMember[];
+    task: Task[];
+};
 
 // ============================================
 // PUBLIC PAGES (No Authentication Required)
@@ -38,6 +39,30 @@ export const handleRegister = (req: Request, res: Response) => {
     });
 };
 
+
+export const handleMainPage = (req: AuthenticatedRequest, res: Response) => {
+    if (!req.user){
+        return res.redirect("/login");
+    }
+    res.render('pages/main-page',{
+        pageTitle: 'Main',
+        user: req.user,
+        groups : req.groups,
+    })
+};
+
+export const handleDashboard = (req: AuthenticatedRequest, res: Response) =>{
+    if(!req.user){
+        return res.redirect('/')
+    }
+    res.render('pages/dashboard-page'), {
+        pageTitle: 'Dashboard',
+        group: req.group,
+        members: req.members,
+
+    }
+};
+
 // ============================================
 // PROTECTED PAGES (Authentication Required)
 // ============================================
@@ -46,117 +71,117 @@ export const handleRegister = (req: Request, res: Response) => {
  * Renders the main dashboard page
  * GET /dashboard
  */
-export const handleDashboard = async (req: AuthenticatedRequest, res: Response) => {
-    // Middleware ensures req.user exists, but double-check for safety
-    if (!req.user) {
-        return res.redirect('/login');
-    }
+// export const handleDashboard = async (req: AuthenticatedRequest, res: Response) => {
+//     // Middleware ensures req.user exists, but double-check for safety
+//     if (!req.user) {
+//         return res.redirect('/login');
+//     }
 
-    let groups: Group[] = [];
+//     let groups: Group[] = [];
     
-    try {
-        // Fetch all groups the user belongs to
-        groups = await GroupService.getGroups(req.user as User);
-    } catch (err) {
-        console.error("Error fetching groups for dashboard:", err);
-        // Continue rendering with empty groups array
-    }
+//     try {
+//         // Fetch all groups the user belongs to
+//         groups = await GroupService.getGroups(req.user as User);
+//     } catch (err) {
+//         console.error("Error fetching groups for dashboard:", err);
+//         // Continue rendering with empty groups array
+//     }
 
-    res.render('pages/main-page', { 
-        pageTitle: 'Dashboard',
-        user: req.user,
-        groups: groups,
-    });
-};
+//     res.render('pages/main-page', { 
+//         pageTitle: 'Dashboard',
+//         user: req.user,
+//         groups: groups,
+//     });
+// };
 
-/**
- * Renders a specific group component (partial view)
- * GET /groups/:groupId
- */
-export const handleGroupView = async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-        return res.status(403).send("Forbidden");
-    }
+// /**
+//  * Renders a specific group component (partial view)
+//  * GET /groups/:groupId
+//  */
+// export const handleGroupView = async (req: AuthenticatedRequest, res: Response) => {
+//     if (!req.user) {
+//         return res.status(403).send("Forbidden");
+//     }
 
-    const groupId = parseInt(req.params.groupId);
+//     const groupId = parseInt(req.params.groupId);
 
-    if (isNaN(groupId)) {
-        return res.status(400).send("Invalid Group ID");
-    }
+//     if (isNaN(groupId)) {
+//         return res.status(400).send("Invalid Group ID");
+//     }
 
-    try {
-        // Fetch group details
-        const group = await GroupService.getGroupById(groupId);
+//     try {
+//         // Fetch group details
+//         const group = await GroupService.getGroupById(groupId);
         
-        if (!group) {
-            return res.status(404).send("Group not found");
-        }
+//         if (!group) {
+//             return res.status(404).send("Group not found");
+//         }
 
-        // Fetch group members
-        const members = await GroupService.getGroupMembers(groupId);
+//         // Fetch group members
+//         const members = await GroupService.getGroupMembers(groupId);
         
-        // Find current user's member record
-        const currentUserMember = members.find(m => m.userId === req.user!.id);
+//         // Find current user's member record
+//         const currentUserMember = members.find(m => m.userId === req.user!.id);
         
-        // Render just the component (no layout wrapper)
-        res.render('components/group-component', {
-            group: group,
-            members: members,
-            currentUserMember: currentUserMember || null,
-            layout: false // Prevents wrapping in main layout
-        });
+//         // Render just the component (no layout wrapper)
+//         res.render('components/group-component', {
+//             group: group,
+//             members: members,
+//             currentUserMember: currentUserMember || null,
+//             layout: false // Prevents wrapping in main layout
+//         });
 
-    } catch (err) {
-        console.error(`Error rendering group view for ID ${groupId}:`, err);
-        return res.status(500).send("Server error fetching group data.");
-    }
-};
+//     } catch (err) {
+//         console.error(`Error rendering group view for ID ${groupId}:`, err);
+//         return res.status(500).send("Server error fetching group data.");
+//     }
+// };
 
-export const handleGroupPage = async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.user) {
-        return res.redirect('/login');
-    }
+// export const handleGroupPage = async (req: AuthenticatedRequest, res: Response) => {
+//     if (!req.user) {
+//         return res.redirect('/login');
+//     }
 
-    const groupId = parseInt(req.params.groupId);
+//     const groupId = parseInt(req.params.groupId);
 
-    if (isNaN(groupId)) {
-        return res.status(400).send("Invalid Group ID");
-    }
+//     if (isNaN(groupId)) {
+//         return res.status(400).send("Invalid Group ID");
+//     }
 
-    try {
-        // Fetch group details
-        const group = await GroupService.getGroupById(groupId);
+//     try {
+//         // Fetch group details
+//         const group = await GroupService.getGroupById(groupId);
         
-        if (!group) {
-            return res.status(404).send("Group not found");
-        }
+//         if (!group) {
+//             return res.status(404).send("Group not found");
+//         }
 
-        // Fetch group members
-        const members = await GroupService.getGroupMembers(groupId);
+//         // Fetch group members
+//         const members = await GroupService.getGroupMembers(groupId);
         
-        // Find current user's member record
-        const currentUserMember = members.find(m => m.userId === req.user!.id);
+//         // Find current user's member record
+//         const currentUserMember = members.find(m => m.userId === req.user!.id);
         
-        if (!currentUserMember) {
-            return res.status(403).send("You are not a member of this group");
-        }
+//         if (!currentUserMember) {
+//             return res.status(403).send("You are not a member of this group");
+//         }
 
-        // Fetch tasks and expenses (you'll need these services)
-        // const tasks = await TaskService.getAllTasks(groupId);
-        // const expenses = await ExpenseService.getAllExpenses(groupId);
+//         // Fetch tasks and expenses (you'll need these services)
+//         // const tasks = await TaskService.getAllTasks(groupId);
+//         // const expenses = await ExpenseService.getAllExpenses(groupId);
         
-        res.render('pages/group-page', {
-            pageTitle: group.name,
-            user: req.user,
-            group: group,
-            members: members,
-            currentUserMember: currentUserMember,
-            // tasks: tasks,
-            // expenses: expenses,
-        });
+//         res.render('pages/group-page', {
+//             pageTitle: group.name,
+//             user: req.user,
+//             group: group,
+//             members: members,
+//             currentUserMember: currentUserMember,
+//             // tasks: tasks,
+//             // expenses: expenses,
+//         });
 
-    } catch (err) {
-        console.error('Error loading group page:', err);
-        return res.status(500).send("Server error");
-    }
-};
+//     } catch (err) {
+//         console.error('Error loading group page:', err);
+//         return res.status(500).send("Server error");
+//     }
+// };
