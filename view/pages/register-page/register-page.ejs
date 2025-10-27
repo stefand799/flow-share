@@ -1,0 +1,107 @@
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join FlowShare to collaborate with your team</p>
+            </div>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-error" id="error-alert">
+                <span class="alert-icon">⚠️</span>
+                <span class="alert-message"><%= error %></span>
+            </div>
+            <% } %>
+            
+            <form action="/auth/register" method="POST" class="auth-form" id="register-form">
+                
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input"
+                        placeholder="Choose a unique username"
+                        required
+                        minlength="3"
+                        maxlength="30"
+                        autofocus
+                    >
+                    <small class="form-hint">3-30 characters, letters and numbers only</small>
+                    <small class="form-error" id="username-error"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailAddress">Email Address *</label>
+                    <input 
+                        type="email" 
+                        id="emailAddress" 
+                        name="emailAddress" 
+                        class="form-input"
+                        placeholder="your.email@example.com"
+                        required
+                    >
+                    <small class="form-error" id="email-error"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <div class="input-with-icon">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input"
+                            placeholder="Create a strong password"
+                            required
+                            minlength="6"
+                        >
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                    <small class="form-hint">At least 6 characters</small>
+                    <small class="form-error" id="password-error"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <div class="input-with-icon">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            class="form-input"
+                            placeholder="Re-enter your password"
+                            required
+                        >
+                        <button type="button" class="toggle-password" id="toggle-confirm-password" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                    <small class="form-error" id="confirm-password-error"></small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">
+                    Create Account
+                </button>
+                
+            </form>
+            
+            <div class="auth-divider">
+                <span>Already have an account?</span>
+            </div>
+            
+            <div class="auth-footer">
+                <a href="/login" class="btn btn-secondary btn-block">
+                    Login to Your Account
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script src="/pages/register-page/register-page.js"></script>

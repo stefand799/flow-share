@@ -1,0 +1,148 @@
+.form-hint {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.form-group:has(.form-hint) {
+  margin-bottom: 1.5rem;
+}
+
+.password-strength {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  height: 4px;
+}
+
+.password-strength span {
+  flex: 1;
+  background-color: #475569;
+  border-radius: 2px;
+  transition: background-color 0.3s;
+}
+
+.password-strength.weak span:nth-child(1) {
+  background-color: #ef4444;
+}
+
+.password-strength.medium span:nth-child(1),
+.password-strength.medium span:nth-child(2) {
+  background-color: #f59e0b;
+}
+
+.password-strength.strong span {
+  background-color: #10b981;
+}
+
+.form-input.valid {
+  border-color: #10b981;
+}
+
+.form-input.invalid {
+  border-color: #ef4444;
+}
+
+.form-group.valid::after {
+  content: "✓";
+  position: absolute;
+  right: 1rem;
+  top: 2.5rem;
+  color: #10b981;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.form-group {
+  position: relative;
+}
+
+.auth-card {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.auth-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-card::-webkit-scrollbar-track {
+  background: #334155;
+  border-radius: 3px;
+}
+
+.auth-card::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.auth-card::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 1.75rem 1.25rem;
+    max-height: 95vh;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group:has(.form-hint) {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-hint {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .form-hint {
+    font-size: 0.7rem;
+  }
+}
+
+.passwords-match {
+  display: none;
+  color: #10b981;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.passwords-match.show {
+  display: flex;
+}
+
+.passwords-match::before {
+  content: "✓";
+  font-weight: bold;
+}
+
+.passwords-mismatch {
+  display: none;
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.passwords-mismatch.show {
+  display: flex;
+}
+
+.passwords-mismatch::before {
+  content: "✗";
+  font-weight: bold;
+}

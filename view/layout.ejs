@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FlowShare' %> | FlowShare</title>
+    
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/layout.css">
+    <link rel="stylesheet" href="/pages/pages.css">
+    <link rel="stylesheet" href="/components/components.css">
+    <link rel="stylesheet" href="/utils/modal.css">
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body class="<%= typeof bodyClass !== 'undefined' ? bodyClass : '' %>">
+    
+    <% if (typeof user !== 'undefined' && user) { %>
+        <nav class="navbar" id="main-navbar">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <a href="/home">FlowShare</a>
+                </div>
+                
+                <div class="navbar-nav">
+                    <% if (typeof group !== 'undefined' && group) { %>
+                        <a href="/home" class="nav-link">
+                            <span>🏠 Home</span>
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <span class="nav-current">
+                            <span>👥 <%= group.name %></span>
+                        </span>
+                    <% } else { %>
+                        <span class="nav-current">
+                            <span>🏠 Home</span>
+                        </span>
+                    <% } %>
+                </div>
+                
+                <div class="navbar-user">
+                    <span class="user-name"><%= user.username %></span>
+                    <button id="logout-btn" class="btn-logout" type="button" title="Logout">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+    <% } else { %>
+        <nav class="navbar navbar-public" id="public-navbar">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <span>FlowShare</span>
+                </div>
+            </div>
+        </nav>
+    <% } %>
+
+    <main class="main-content" id="main-content">
+        <%- body %>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2025 FlowShare. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <% if (typeof user !== 'undefined' && user) { %>
+    <div id="logout-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Logout</h3>
+                <button class="modal-close" data-modal="logout-modal" type="button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-close-modal="logout-modal" type="button">Cancel</button>
+                <button id="confirm-logout-btn" class="btn btn-danger" type="button">Logout</button>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <script src="/utils/modal.js"></script>
+    <script src="/layout.js"></script>
+    
+</body>
+</html>
