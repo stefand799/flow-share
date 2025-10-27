@@ -25,13 +25,6 @@
         <!-- Carousel Container -->
         <div class="group-carousel" id="group-carousel">
             
-            <!-- Create Group Card (Always first) -->
-            <div class="group-card create-group-card" id="create-group-card">
-                <div class="create-icon">➕</div>
-                <h4>Create New Group</h4>
-                <p>Start collaborating with your team</p>
-            </div>
-            
             <!-- User's Group Cards -->
             <% if (groups && groups.length > 0) { %>
                 <% groups.forEach(group => { %>
@@ -60,6 +53,13 @@
                     </div>
                 <% }) %>
             <% } %>
+            
+            <!-- Create Group Card (Always first) -->
+            <div class="group-card create-group-card" id="create-group-card">
+                <div class="create-icon">➕</div>
+                <h4>Create New Group</h4>
+                <p>Start collaborating with your team</p>
+            </div>
             
             <!-- Empty State (shown when no groups) -->
             <% if (!groups || groups.length === 0) { %>

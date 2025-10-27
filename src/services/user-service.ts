@@ -67,6 +67,25 @@ export const findUserById = async (id: number): Promise<SafeUser | null> => {
 };
 
 /**
+ * Find a user by their ID
+ * @param username - The user's ID
+ * @returns User object without password hash, or null if not found
+ */
+export const findUserByUsername = async (username: string): Promise<SafeUser | null> => {
+    const user = await prisma.user.findUnique({ 
+        where: { username } 
+    });
+    
+    if (!user) {
+        return null;
+    }
+
+    // Remove password hash from response
+    const { passwordHash, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+};
+
+/**
  * Update a user's information
  * @param user - User object with updated fields
  * @returns Updated user without password hash, or null if user doesn't exist
