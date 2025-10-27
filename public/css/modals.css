@@ -1,11 +1,9 @@
 /* ============================================
-   MODALS.CSS - Modal System Styles (FIXED)
+   MODALS.CSS - Modal System Styles
    ============================================
    
-   FIXES APPLIED:
-   - Increased z-index to 9999 for modal overlay
-   - Increased z-index to 10000 for modal content
-   - This ensures modals appear above carousel cards and kanban components
+   This file contains styles for the modal system
+   used throughout the application.
 ============================================ */
 
 /* ============================================
@@ -13,7 +11,7 @@
 ============================================ */
 
 .modal {
-    position: fixed !important;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -22,9 +20,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999999 !important; /* MAXIMUM z-index with !important */
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+    z-index: 9999;
 }
 
 .modal.hidden {
@@ -48,7 +44,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    z-index: 999998 !important; /* MAXIMUM z-index with !important */
+    z-index: 9999;
 }
 
 /* ============================================
@@ -65,10 +61,8 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    z-index: 999999 !important; /* MAXIMUM z-index with !important */
-    animation: modalSlideIn 0.3s ease-out;
+    z-index: 10000;
 }
-
 @keyframes modalSlideIn {
     from {
         opacity: 0;
@@ -179,80 +173,26 @@
    MODAL VARIANTS
 ============================================ */
 
-/* Confirmation Modal */
-.modal-content.confirmation {
+/* Small modal */
+.modal-content.modal-sm {
     max-width: 400px;
 }
 
-.modal-content.confirmation .modal-body {
-    text-align: center;
-    padding: 1rem 0;
-}
-
-/* Large Modal */
-.modal-content.large {
+/* Large modal */
+.modal-content.modal-lg {
     max-width: 800px;
 }
 
-/* Small Modal */
-.modal-content.small {
-    max-width: 350px;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-============================================ */
-
+/* Full-width modal (on mobile) */
 @media (max-width: 768px) {
     .modal-content {
-        padding: 1.5rem;
-        max-width: 95%;
         width: 95%;
-    }
-    
-    .modal-header {
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.875rem;
-    }
-    
-    .modal-header h3 {
-        font-size: 1.25rem;
-    }
-    
-    .modal-close {
-        width: 28px;
-        height: 28px;
-        font-size: 1.5rem;
-    }
-    
-    .modal-body {
-        max-height: 50vh;
-    }
-    
-    .modal-footer {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-    }
-    
-    .modal-footer .btn {
-        width: 100%;
-        min-width: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-content {
-        padding: 1.25rem;
-        border-radius: 8px;
-    }
-    
-    .modal-header h3 {
-        font-size: 1.125rem;
+        max-height: 95vh;
     }
 }
 
 /* ============================================
-   CUSTOM SCROLLBAR FOR MODAL
+   MODAL SCROLLBARS
 ============================================ */
 
 .modal-content::-webkit-scrollbar,

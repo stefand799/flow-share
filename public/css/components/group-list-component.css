@@ -1,14 +1,11 @@
 /* ============================================
-   GROUP-LIST-COMPONENT.CSS - Scroll-Snap Carousel
+   GROUP-LIST-COMPONENT.CSS - Groups Carousel (FIXED)
    ============================================
    
-   Features:
-   - Horizontal scroll with snap-to-center
-   - Smooth scrolling behavior
-   - Active card highlighting
-   - Individual dot indicators
-   - Arrow navigation
-   - Clean, simple design
+   Fixed issues:
+   - Carousel now properly displays cards in a scrollable row
+   - Navigation arrows work correctly
+   - Cards maintain proper sizing
 ============================================ */
 
 /* ============================================
@@ -18,11 +15,10 @@
 .groups-list-container {
     position: relative;
     width: 100%;
-    padding: 0;
 }
 
 /* ============================================
-   CAROUSEL WRAPPER (contains arrows + carousel)
+   CAROUSEL WRAPPER
 ============================================ */
 
 .carousel-wrapper {
@@ -30,43 +26,56 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
-    width: 50rem;
+    margin-bottom: 1.5rem;
 }
 
 /* ============================================
-   CAROUSEL ARROWS
+   CAROUSEL CONTAINER - FIXED TO SHOW ONE CARD AT A TIME
+============================================ */
+
+.group-carousel {
+    display: flex;
+    gap: 1.5rem;
+    overflow: hidden; /* Hide cards outside viewport */
+    scroll-behavior: smooth;
+    padding: 1rem 0.5rem;
+    flex: 1;
+    position: relative;
+}
+
+/* ============================================
+   CAROUSEL ARROWS - IMPROVED
 ============================================ */
 
 .carousel-arrow {
     position: relative;
     background: white;
-    border: 2px solid #e5e7eb;
-    color: #6b7280;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     font-size: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+    z-index: 10; /* Ensure arrows are above cards */
 }
 
 .carousel-arrow:hover:not(:disabled) {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
     color: white;
     transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
 .carousel-arrow:active:not(:disabled) {
-    transform: scale(1.05);
+    transform: scale(0.95);
 }
 
 .carousel-arrow:disabled {
@@ -75,61 +84,68 @@
 }
 
 /* ============================================
-   GROUP CAROUSEL - SCROLL SNAP
-============================================ */
-
-.group-carousel {
-    display: flex;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory; /* Snap to cards */
-    scroll-behavior: smooth;
-    padding: 1.5rem 0.5rem;
-    gap: 1.5rem;
-    flex: 1;
-    width: 0.8rem;
-    /* Hide scrollbar */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
-.group-carousel::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-
-/* ============================================
-   GROUP CARDS
+   GROUP CARDS - FIXED SIZING FOR CAROUSEL
 ============================================ */
 
 .group-card {
-    flex: 0 0 280px; /* Fixed width 280px */
-    min-width: 280px;
-    height: 280px;
-    scroll-snap-align: center; /* Snap to center */
-    border: 2px solid #e5e7eb;
+    min-width: 100%; /* Each card takes full width of carousel */
+    background: white;
     border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    background-color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex-shrink: 0; /* Prevent cards from shrinking */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateX(0); /* For smooth transitions */
 }
 
 .group-card:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-.group-card.active {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 8px 16px rgba(59, 130, 246, 0.3);
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+/* ============================================
+   CREATE GROUP CARD
+============================================ */
+
+.create-group-card {
+    border: 2px dashed #cbd5e0;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 220px;
+}
+
+.create-group-card:hover {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+}
+
+.create-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.create-group-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+}
+
+.create-group-card p {
+    font-size: 0.95rem;
+    color: #718096;
+    margin: 0;
 }
 
 /* ============================================
@@ -138,50 +154,40 @@
 
 .group-card-header {
     margin-bottom: 1rem;
-    width: 100%;
 }
 
-.group-card-title,
-.group-card h4 {
-    font-size: 1.375rem;
+.group-card-title {
+    font-size: 1.25rem;
     font-weight: 700;
-    color: #1f2937;
-    margin: 0 0 0.75rem 0;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.group-card.active .group-card-title,
-.group-card.active h4 {
-    color: #3b82f6;
-}
-
 .group-card-body {
     flex: 1;
     margin-bottom: 1rem;
-    width: 100%;
 }
 
-.group-card-description,
-.group-card p {
-    color: #6b7280;
+.group-card-description {
     font-size: 0.95rem;
-    line-height: 1.5;
+    color: #718096;
     margin: 0 0 1rem 0;
+    line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* Standard property for compatibility */
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 2.85rem; /* 2 lines */
 }
 
 .group-card-meta {
     display: flex;
     gap: 1rem;
-    justify-content: center;
     flex-wrap: wrap;
-    width: 100%;
 }
 
 .meta-item {
@@ -189,7 +195,7 @@
     align-items: center;
     gap: 0.375rem;
     font-size: 0.875rem;
-    color: #4b5563;
+    color: #4a5568;
 }
 
 .meta-icon {
@@ -198,88 +204,35 @@
 
 .group-card-footer {
     padding-top: 0.75rem;
-    border-top: 1px solid #e5e7eb;
-    width: 100%;
+    border-top: 1px solid #e2e8f0;
+    margin-top: auto; /* Push to bottom */
 }
 
 .view-link {
-    color: #3b82f6;
+    color: #667eea;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     transition: color 0.2s;
 }
 
 .group-card:hover .view-link {
-    color: #2563eb;
-}
-
-/* ============================================
-   CREATE GROUP CARD
-============================================ */
-
-.create-group-card {
-    border: 2px dashed #9ca3af;
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.create-group-card:hover {
-    border-color: #3b82f6;
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-}
-
-.create-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #3b82f6;
-    transition: transform 0.3s;
-}
-
-.create-group-card:hover .create-icon {
-    transform: scale(1.15);
-}
-
-.create-group-card h4 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin: 0 0 0.5rem 0;
-}
-
-.create-group-card p {
-    font-size: 0.95rem;
-    color: #6b7280;
-    margin: 0;
+    color: #764ba2;
 }
 
 /* ============================================
    EMPTY STATE CARD
 ============================================ */
 
-.empty-state-card,
-.no-groups-card {
-    flex: 0 0 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    border: 2px dashed #9ca3af;
-    background-color: #f9fafb;
-    color: #6b7280;
+.empty-state-card {
+    min-width: 280px;
+    width: 280px;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
     border-radius: 12px;
-    padding: 2rem;
+    padding: 2rem 1.5rem;
     text-align: center;
-}
-
-.no-groups-card:hover,
-.empty-state-card:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-    background-color: #eff6ff;
+    color: #718096;
+    flex-shrink: 0;
 }
 
 .empty-icon {
@@ -289,50 +242,48 @@
 }
 
 .empty-state-card h4 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    color: #4b5563;
+    color: #4a5568;
     margin: 0 0 0.5rem 0;
 }
 
 .empty-state-card p {
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
 }
 
 /* ============================================
-   CAROUSEL INDICATORS
+   CAROUSEL INDICATORS (DOTS)
 ============================================ */
 
 .carousel-indicators {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 0;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
 }
 
 .carousel-indicator {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background-color: #d1d5db;
+    background-color: #cbd5e0;
     border: none;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     padding: 0;
 }
 
 .carousel-indicator:hover {
-    background-color: #9ca3af;
-    transform: scale(1.3);
+    background-color: #a0aec0;
+    transform: scale(1.2);
 }
 
 .carousel-indicator.active {
-    background: #3b82f6;
-    width: 32px;
-    border-radius: 5px;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 24px;
+    border-radius: 4px;
 }
 
 /* ============================================
@@ -341,9 +292,11 @@
 
 @media (max-width: 1024px) {
     .group-card {
-        flex: 0 0 260px;
-        min-width: 260px;
-        height: 260px;
+        min-width: 100%;
+    }
+    
+    .empty-state-card {
+        min-width: 100%;
     }
 }
 
@@ -359,24 +312,32 @@
     }
     
     .group-card {
-        flex: 0 0 240px;
-        min-width: 240px;
-        height: 240px;
+        min-width: 100%;
         padding: 1.25rem;
     }
     
-    .group-card-title,
-    .group-card h4 {
-        font-size: 1.25rem;
+    .empty-state-card {
+        min-width: 100%;
     }
     
-    .group-card-description,
-    .group-card p {
-        font-size: 0.875rem;
+    .group-card-title {
+        font-size: 1.125rem;
+    }
+    
+    .group-card-description {
+        font-size: 0.9rem;
+    }
+    
+    .create-group-card {
+        min-height: 200px;
     }
     
     .create-icon {
         font-size: 2.5rem;
+    }
+    
+    .create-group-card h4 {
+        font-size: 1.125rem;
     }
 }
 
@@ -392,10 +353,12 @@
     }
     
     .group-card {
-        flex: 0 0 220px;
-        min-width: 220px;
-        height: 220px;
+        min-width: 100%;
         padding: 1rem;
+    }
+    
+    .empty-state-card {
+        min-width: 100%;
     }
     
     .group-carousel {
@@ -413,8 +376,12 @@
 }
 
 /* ============================================
-   SMOOTH SCROLL ANIMATION
+   ANIMATION
 ============================================ */
+
+.group-card {
+    animation: slideIn 0.3s ease-out;
+}
 
 @keyframes slideIn {
     from {
@@ -425,10 +392,6 @@
         opacity: 1;
         transform: translateX(0);
     }
-}
-
-.group-card {
-    animation: slideIn 0.3s ease-out;
 }
 
 /* Stagger animation for multiple cards */

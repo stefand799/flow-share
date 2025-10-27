@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import * as GroupService from "../services/group-service";
 import { Group, User, GroupMember} from "../generated/prisma";
 import * as MemberService from "../services/member-service";
-import { userInfo } from "os";
 
 interface AuthenticateRequest extends Request {
     user?: Omit<User, 'passwordHash'>;
@@ -37,12 +36,21 @@ export const handleCreate = async (req: AuthenticateRequest, res: Response) => {
         } as Group;
 
         const createdGroup = await GroupService.createGroup(groupToCreate);
-        // TODO: need to add the creator and promote as admin 
+        
         if (!createdGroup) {
             return res.status(409).json({ 
                 message: "A group with this name already exists." 
             });
         }
+
+        // Add the creator as a member and admin
+        const creatorMember: GroupMember = {
+            userId: authenticatedUserId,
+            groupId: createdGroup.id,
+            isAdmin: true
+        } as GroupMember;
+
+        await MemberService.addMember(creatorMember);
 
         return res.status(201).json({ 
             message: "Group created successfully.",

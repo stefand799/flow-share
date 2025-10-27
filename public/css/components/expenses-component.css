@@ -115,3 +115,38 @@ background-color: #f0fff4; /* green-50 */
 transition: all 0.3s ease-in-out;
 overflow: hidden;
 }
+
+.expenses-placeholder {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-message h3 {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+}
+
+.placeholder-message p {
+    color: #718096;
+    margin: 0.5rem 0;
+}
+
+.expense-count {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #edf2f7;
+    border-radius: 8px;
+    font-size: 1.125rem;
+}
+
+.empty-state {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+}

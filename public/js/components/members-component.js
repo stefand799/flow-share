@@ -1,4 +1,6 @@
+// ============================================
 // MEMBERS-COMPONENT.JS - Members List JavaScript
+// ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const membersList = document.getElementById('members-list');
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Populate actions (admin only)
         if (isCurrentUserAdmin && member.id !== currentMemberId) {
             memberModalActions.innerHTML = `
-                <button class="btn btn-secondary" data-close-modal="member-detail-modal" type="button">Close</button>
+                <button class="btn btn-secondary close-member-modal-btn" type="button">Close</button>
                 ${!member.isAdmin ? `
                     <button class="btn btn-primary" onclick="promoteMember('${member.id}')" type="button">Promote to Admin</button>
                 ` : `
@@ -70,8 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else {
             memberModalActions.innerHTML = `
-                <button class="btn btn-secondary" data-close-modal="member-detail-modal" type="button">Close</button>
+                <button class="btn btn-secondary close-member-modal-btn" type="button">Close</button>
             `;
+        }
+        
+        // Add event listener to the close button after it's created
+        const closeBtn = memberModalActions.querySelector('.close-member-modal-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                closeModal('member-detail-modal');
+            });
         }
         
         openModal('member-detail-modal');
@@ -130,4 +140,5 @@ document.addEventListener('DOMContentLoaded', () => {
             window.dashboardUtils?.showError(error.message);
         }
     };
+    
 });

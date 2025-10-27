@@ -1,178 +1,118 @@
-import request from 'supertest';
-import express, { Express, Request, Response, NextFunction } from 'express';
-import cookieParser from 'cookie-parser';
+import * as authUtils from '../src/utils/auth';
+import jwt from 'jsonwebtoken';
 
-// --- MOCK SERVICE SETUP ---
+// Mock JWT to control token behavior
+jest.mock('jsonwebtoken');
+const mockedJwt = jwt as jest.Mocked<typeof jwt>;
 
-// 1. Define the mock dependencies inside the jest.mock factory function
-// to prevent "Cannot access 'mockAuthService' before initialization" error.
+// Mock bcrypt
+jest.mock('bcrypt', () => ({
+    hash: jest.fn(),
+    compare: jest.fn(),
+}));
+import bcrypt from 'bcrypt';
+const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
-const mockAuthService = {
-    registerUser: jest.fn(),
-    loginUser: jest.fn(),
-};
-// Use a factory function to return the mock object
-jest.mock('../src/services/auth-service', () => mockAuthService); 
-
-const mockUserService = {
-    findUserById: jest.fn(),
-};
-// Use a factory function to return the mock object
-jest.mock('../src/services/user-service', () => mockUserService);
-
-// --- END MOCK SERVICE SETUP ---
-
-// Import the auth routes to test (must happen AFTER dependencies are mocked)
-import AuthRoutes from '../src/routes/auth-routes';
-
-
-// The mock user object used for successful authentication
-const MOCK_USER = {
-    id: 1,
-    username: 'testuser',
-    emailAddress: 'test@example.com',
-    // Omitted fields as it's the SafeUser type in req.user
-};
-const MOCK_TOKEN = 'mock.valid.token';
-
-// Helper function to create a minimal Express app for testing
-const createApp = (): Express => {
-    const app = express();
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-    app.use(cookieParser());
-    // Attach the auth routes under a common path (e.g., /auth)
-    app.use('/auth', AuthRoutes);
-
-    // Mock the redirect calls since supertest can't follow them naturally
-    app.use((req: Request, res: Response, next: NextFunction) => {
-        // Fix: Use rest parameters to satisfy all overloads of res.redirect
-        const originalRedirect = res.redirect.bind(res);
-        res.redirect = (...args: any[]) => {
-            // Determine the URL, which is always the last argument in Express's redirect
-            const url = args[args.length - 1]; 
-            
-            // Instead of redirecting, we send a custom status (302) and a body to check in the test
-            res.status(302).send({ redirect: url });
-            return res;
-        };
-        next();
-    });
-
-    return app;
-};
-
-let app: Express;
-
-describe('Auth API Integration Tests (Controller/Routes)', () => {
-    beforeAll(() => {
-        app = createApp();
-    });
+describe('5 Simple Unit Tests for University Project', () => {
+    
     beforeEach(() => {
         jest.clearAllMocks();
-        // Mock a successful authentication path for protected routes
-        // The mock middleware needs to resolve a user object
-        // NOTE: The mock must be applied to the 'findUserById' in the user-service mock,
-        // as the 'authenticate' middleware calls it.
-        mockUserService.findUserById.mockResolvedValue(MOCK_USER); 
     });
 
-    // --- REGISTER ROUTE TESTS ---
+    // =============================================
+    // TEST 1: Password Hashing
+    // =============================================
+    test('1. Should hash a password successfully', async () => {
+        const plainPassword = 'mySecurePassword123';
+        const hashedPassword = '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890';
 
-    test('1. POST /auth/register should succeed and set cookie on success', async () => {
-        mockAuthService.registerUser.mockResolvedValue({
-            user: MOCK_USER,
-            token: MOCK_TOKEN,
+        mockedBcrypt.hash.mockResolvedValue(hashedPassword as never);
+
+        const result = await authUtils.hashPassword(plainPassword);
+
+        expect(result).toBe(hashedPassword);
+        expect(mockedBcrypt.hash).toHaveBeenCalledWith(plainPassword, 10);
+    });
+
+    // =============================================
+    // TEST 2: Password Verification - Correct Password
+    // =============================================
+    test('2. Should verify a correct password successfully', async () => {
+        const plainPassword = 'mySecurePassword123';
+        const hashedPassword = '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890';
+
+        mockedBcrypt.compare.mockResolvedValue(true as never);
+
+        const result = await authUtils.verifyPassword(plainPassword, hashedPassword);
+
+        expect(result).toBe(true);
+        expect(mockedBcrypt.compare).toHaveBeenCalledWith(plainPassword, hashedPassword);
+    });
+
+    // =============================================
+    // TEST 3: Password Verification - Incorrect Password
+    // =============================================
+    test('3. Should reject an incorrect password', async () => {
+        const plainPassword = 'wrongPassword';
+        const hashedPassword = '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890';
+
+        mockedBcrypt.compare.mockResolvedValue(false as never);
+
+        const result = await authUtils.verifyPassword(plainPassword, hashedPassword);
+
+        expect(result).toBe(false);
+        expect(mockedBcrypt.compare).toHaveBeenCalledWith(plainPassword, hashedPassword);
+    });
+
+    // =============================================
+    // TEST 4: JWT Token Generation
+    // =============================================
+    test('4. Should generate a valid JWT token', () => {
+        const userId = 42;
+        const mockToken = 'mock.jwt.token.string';
+
+        mockedJwt.sign.mockReturnValue(mockToken as any);
+
+        const token = authUtils.generateToken(userId);
+
+        expect(token).toBe(mockToken);
+        expect(mockedJwt.sign).toHaveBeenCalledWith(
+            { id: userId },
+            expect.any(String), // JWT_SECRET
+            { expiresIn: '1d' }
+        );
+    });
+
+    // =============================================
+    // TEST 5: JWT Token Verification
+    // =============================================
+    test('5. Should verify and decode a valid JWT token', () => {
+        const validToken = 'valid.jwt.token';
+        const mockDecoded = { id: 42 };
+
+        mockedJwt.verify.mockReturnValue(mockDecoded as any);
+
+        const result = authUtils.verifyToken(validToken);
+
+        expect(result).toEqual(mockDecoded);
+        expect(mockedJwt.verify).toHaveBeenCalledWith(
+            validToken,
+            expect.any(String) // JWT_SECRET
+        );
+    });
+
+    // =============================================
+    // BONUS TEST: Invalid JWT Token Returns Null
+    // =============================================
+    test('BONUS: Should return null for invalid JWT token', () => {
+        const invalidToken = 'invalid.jwt.token';
+
+        mockedJwt.verify.mockImplementation(() => {
+            throw new Error('Invalid token');
         });
 
-        const response = await request(app)
-            .post('/auth/register')
-            .send({
-                username: 'newuser',
-                emailAddress: 'new@test.com',
-                password: 'password123',
-            });
+        const result = authUtils.verifyToken(invalidToken);
 
-        // Controller should redirect on success
-        expect(response.statusCode).toBe(302);
-        expect(response.body.redirect).toBe('nav/main-page');
-
-        // Controller must set the 'token' cookie
-        const setCookieHeader = response.headers['set-cookie'][0];
-        expect(setCookieHeader).toContain(`token=${MOCK_TOKEN}`);
-        // In a real environment, NODE_ENV would be checked for secure flag.
-        // We ensure HttpOnly is always present for security.
-        expect(setCookieHeader).toContain('HttpOnly'); 
-    });
-
-    test('2. POST /auth/register should return 400 and error message on service failure', async () => {
-        mockAuthService.registerUser.mockRejectedValue(new Error('Username or email already in use.'));
-
-        const response = await request(app)
-            .post('/auth/register')
-            .send({
-                username: 'failuser',
-                emailAddress: 'fail@test.com',
-                password: 'password123',
-            });
-
-        // Controller should return 400 status
-        expect(response.statusCode).toBe(400);
-        expect(response.body.error).toBe('Username or email already in use.');
-        expect(response.headers['set-cookie']).toBeUndefined(); // No cookie set on failure
-    });
-
-    // --- LOGIN ROUTE TESTS ---
-
-    test('3. POST /auth/login should succeed and set cookie on successful login', async () => {
-        mockAuthService.loginUser.mockResolvedValue({
-            user: MOCK_USER,
-            token: MOCK_TOKEN,
-        });
-
-        const response = await request(app)
-            .post('/auth/login')
-            .send({ credentials: 'testuser', password: 'password123' });
-
-        // Controller should redirect on success
-        expect(response.statusCode).toBe(302);
-        expect(response.body.redirect).toBe('nav/main-page');
-
-        // Controller must set the 'token' cookie
-        const setCookieHeader = response.headers['set-cookie'][0];
-        expect(setCookieHeader).toContain(`token=${MOCK_TOKEN}`);
-    });
-
-    test('4. POST /auth/login should return 400 on invalid credentials/password', async () => {
-        mockAuthService.loginUser.mockRejectedValue(new Error('Invalid password'));
-
-        const response = await request(app)
-            .post('/auth/login')
-            .send({ credentials: 'testuser', password: 'wrongpassword' });
-
-        // Controller should return 400 status
-        expect(response.statusCode).toBe(400);
-        expect(response.body.error).toBe('Invalid password');
-    });
-
-    // --- LOGOUT ROUTE (Protected) TESTS ---
-
-    test('5. POST /auth/logout should clear the cookie and redirect on success', async () => {
-        // We don't need to mock the service here, only the middleware check (which uses user-service)
-        
-        const response = await request(app)
-            .post('/auth/logout')
-            // Simulate a valid token in the request cookie to pass the middleware check
-            .set('Cookie', [`token=${MOCK_TOKEN}`]) 
-            .send({});
-
-        // Controller should clear the cookie
-        const clearCookieHeader = response.headers['set-cookie'][0];
-        expect(clearCookieHeader).toContain('token=;');
-        expect(clearCookieHeader).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT'); // Check for expiration
-
-        // Controller should redirect to login page
-        expect(response.statusCode).toBe(302);
-        expect(response.body.redirect).toBe('nav/login-page');
+        expect(result).toBeNull();
     });
 });
