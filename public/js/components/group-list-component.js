@@ -1,13 +1,14 @@
 // ============================================
-// GROUP-LIST-COMPONENT.JS - Group List Component JavaScript
+// GROUP-LIST-COMPONENT.JS - Scroll-Snap Carousel
 // ============================================
 // 
-// This file handles:
-// - Carousel navigation
-// - Group card click (navigate to dashboard)
-// - Create group modal
-// - Create group via API
-// - Carousel indicators
+// Features:
+// - Scroll-snap carousel navigation
+// - Arrow button controls
+// - Individual dot indicators (one per card)
+// - Auto-detect active card on scroll
+// - Smooth scrolling
+// - Touch/swipe support
 // 
 // Dependencies: modal.js (for modal utilities)
 // ============================================
@@ -32,50 +33,157 @@ document.addEventListener('DOMContentLoaded', () => {
     const groupDescriptionInput = document.getElementById('group-description');
     
     // ============================================
-    // CAROUSEL NAVIGATION
+    // CAROUSEL STATE
     // ============================================
     
-    if (carousel && leftArrow && rightArrow) {
+    let allCards = [];
+    let currentIndex = 0;
+    let isScrolling = false;
+    
+    // ============================================
+    // INITIALIZE CAROUSEL
+    // ============================================
+    
+    function initializeCarousel() {
+        if (!carousel) return;
         
-        // Scroll amount (one card width + gap)
-        const scrollAmount = 300;
+        // Get all cards
+        allCards = Array.from(carousel.querySelectorAll('.group-card'));
         
-        // Left arrow click
-        leftArrow.addEventListener('click', () => {
-            carousel.scrollBy({
-                left: -scrollAmount,
-                behavior: 'smooth'
-            });
-        });
+        if (allCards.length === 0) return;
         
-        // Right arrow click
-        rightArrow.addEventListener('click', () => {
-            carousel.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        });
+        // Create indicators
+        createIndicators();
         
-        // Update arrow states based on scroll position
-        function updateArrows() {
-            const scrollLeft = carousel.scrollLeft;
-            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-            
-            // Disable left arrow at start
-            leftArrow.disabled = scrollLeft <= 0;
-            
-            // Disable right arrow at end
-            rightArrow.disabled = scrollLeft >= maxScroll - 5; // -5 for rounding
+        // Set up scroll detection
+        setupScrollDetection();
+        
+        // Update arrow states
+        updateArrowStates();
+        
+        // Set first card as active
+        if (allCards.length > 0) {
+            allCards[0].classList.add('active');
+            updateIndicators();
         }
+    }
+    
+    // ============================================
+    // SCROLL DETECTION
+    // ============================================
+    
+    function setupScrollDetection() {
+        if (!carousel) return;
         
-        // Listen to scroll events
-        carousel.addEventListener('scroll', updateArrows);
+        let scrollTimeout;
         
-        // Initial update
-        updateArrows();
+        carousel.addEventListener('scroll', () => {
+            isScrolling = true;
+            
+            // Clear previous timeout
+            clearTimeout(scrollTimeout);
+            
+            // Set new timeout
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+                detectActiveCard();
+            }, 150);
+            
+            // Update arrows immediately
+            updateArrowStates();
+        });
+    }
+    
+    /**
+     * Detects which card is currently in the center of the viewport
+     */
+    function detectActiveCard() {
+        if (!carousel || allCards.length === 0) return;
         
-        // Update on window resize
-        window.addEventListener('resize', updateArrows);
+        const carouselRect = carousel.getBoundingClientRect();
+        const carouselCenter = carouselRect.left + carouselRect.width / 2;
+        
+        let closestCard = allCards[0];
+        let closestDistance = Infinity;
+        
+        allCards.forEach((card, index) => {
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.left + cardRect.width / 2;
+            const distance = Math.abs(cardCenter - carouselCenter);
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestCard = card;
+                currentIndex = index;
+            }
+        });
+        
+        // Update active states
+        allCards.forEach(card => card.classList.remove('active'));
+        closestCard.classList.add('active');
+        
+        // Update indicators
+        updateIndicators();
+    }
+    
+    // ============================================
+    // ARROW NAVIGATION
+    // ============================================
+    
+    if (leftArrow && rightArrow && carousel) {
+        leftArrow.addEventListener('click', () => {
+            scrollToPrevious();
+        });
+        
+        rightArrow.addEventListener('click', () => {
+            scrollToNext();
+        });
+    }
+    
+    function scrollToPrevious() {
+        if (currentIndex > 0) {
+            scrollToCard(currentIndex - 1);
+        }
+    }
+    
+    function scrollToNext() {
+        if (currentIndex < allCards.length - 1) {
+            scrollToCard(currentIndex + 1);
+        }
+    }
+    
+    function scrollToCard(index) {
+        if (index < 0 || index >= allCards.length) return;
+        
+        const card = allCards[index];
+        const cardRect = card.getBoundingClientRect();
+        const carouselRect = carousel.getBoundingClientRect();
+        
+        // Calculate scroll position to center the card
+        const scrollLeft = carousel.scrollLeft + 
+                          (cardRect.left - carouselRect.left) - 
+                          (carouselRect.width / 2) + 
+                          (cardRect.width / 2);
+        
+        carousel.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+        });
+        
+        currentIndex = index;
+    }
+    
+    function updateArrowStates() {
+        if (!leftArrow || !rightArrow || !carousel) return;
+        
+        const scrollLeft = carousel.scrollLeft;
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        
+        // Disable left arrow at start
+        leftArrow.disabled = scrollLeft <= 5;
+        
+        // Disable right arrow at end
+        rightArrow.disabled = scrollLeft >= maxScroll - 5;
     }
     
     // ============================================
@@ -83,56 +191,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     
     function createIndicators() {
-        if (!carousel || !indicators) return;
-        
-        const cards = carousel.querySelectorAll('.group-card:not(.create-group-card)');
-        const cardsPerView = Math.floor(carousel.clientWidth / 300);
-        const numIndicators = Math.max(1, Math.ceil(cards.length / cardsPerView));
+        if (!indicators || allCards.length === 0) return;
         
         // Clear existing indicators
         indicators.innerHTML = '';
         
-        // Create indicator dots
-        for (let i = 0; i < numIndicators; i++) {
+        // Create one indicator per card
+        allCards.forEach((card, index) => {
             const indicator = document.createElement('button');
             indicator.className = 'carousel-indicator';
-            indicator.setAttribute('aria-label', `Go to page ${i + 1}`);
+            indicator.setAttribute('aria-label', `Go to group ${index + 1}`);
+            indicator.setAttribute('data-index', index);
+            
             indicator.addEventListener('click', () => {
-                const scrollTo = i * cardsPerView * 300;
-                carousel.scrollTo({
-                    left: scrollTo,
-                    behavior: 'smooth'
-                });
+                scrollToCard(index);
             });
+            
             indicators.appendChild(indicator);
-        }
+        });
         
-        updateActiveIndicator();
+        updateIndicators();
     }
     
-    function updateActiveIndicator() {
-        if (!carousel || !indicators) return;
-        
-        const scrollLeft = carousel.scrollLeft;
-        const cards = carousel.querySelectorAll('.group-card:not(.create-group-card)');
-        const cardsPerView = Math.floor(carousel.clientWidth / 300);
-        const currentPage = Math.floor(scrollLeft / (cardsPerView * 300));
+    function updateIndicators() {
+        if (!indicators) return;
         
         const allIndicators = indicators.querySelectorAll('.carousel-indicator');
         allIndicators.forEach((indicator, index) => {
-            if (index === currentPage) {
+            if (index === currentIndex) {
                 indicator.classList.add('active');
             } else {
                 indicator.classList.remove('active');
             }
         });
-    }
-    
-    // Initialize indicators
-    if (carousel && indicators) {
-        createIndicators();
-        carousel.addEventListener('scroll', updateActiveIndicator);
-        window.addEventListener('resize', createIndicators);
     }
     
     // ============================================
@@ -175,19 +266,19 @@ document.addEventListener('DOMContentLoaded', () => {
         createGroupCard.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                createGroupCard.click();
+                openModal('create-group-modal');
             }
         });
     }
     
-    // Create group button click
+    // Submit create group form
     if (createGroupBtn) {
         createGroupBtn.addEventListener('click', async () => {
             await createGroup();
         });
     }
     
-    // Description character counter
+    // Character counter for description
     if (groupDescriptionInput) {
         groupDescriptionInput.addEventListener('input', () => {
             const maxLength = 200;
@@ -204,8 +295,17 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function createGroup() {
         try {
-            // Validate form
-            if (!validateGroupForm()) {
+            // Validate inputs
+            const name = groupNameInput.value.trim();
+            const description = groupDescriptionInput.value.trim();
+            
+            if (!name || name.length < 3) {
+                showError('Group name must be at least 3 characters');
+                return;
+            }
+            
+            if (name.length > 50) {
+                showError('Group name must be less than 50 characters');
                 return;
             }
             
@@ -213,130 +313,66 @@ document.addEventListener('DOMContentLoaded', () => {
             createGroupBtn.disabled = true;
             createGroupBtn.textContent = 'Creating...';
             
-            // Gather form data
-            const formData = {
-                name: groupNameInput.value.trim(),
-                description: groupDescriptionInput.value.trim() || null
-            };
-            
-            // Send POST request
+            // Make API request
             const response = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ name, description })
             });
             
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to create group');
+            const data = await response.json();
+            
+            if (response.ok) {
+                showSuccess('Group created successfully!');
+                
+                // Close modal
+                closeModal('create-group-modal');
+                
+                // Reset form
+                createGroupForm.reset();
+                
+                // Redirect to new group dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = `/dashboard/${data.group.id}`;
+                }, 1000);
+                
+            } else {
+                showError(data.message || 'Failed to create group');
             }
-            
-            const newGroup = await response.json();
-            
-            // Close modal
-            closeModal('create-group-modal');
-            
-            // Clear form
-            createGroupForm.reset();
-            
-            // Show success message
-            showSuccess('Group created successfully!');
-            
-            // Emit custom event for home page
-            window.dispatchEvent(new CustomEvent('group-created', { detail: newGroup }));
-            
-            // Redirect to new group's dashboard
-            setTimeout(() => {
-                window.location.href = `/dashboard/${newGroup.id}`;
-            }, 500);
             
         } catch (error) {
             console.error('Error creating group:', error);
-            showError(`Failed to create group: ${error.message}`);
+            showError('An error occurred while creating the group');
         } finally {
-            // Re-enable button
             createGroupBtn.disabled = false;
             createGroupBtn.textContent = 'Create Group';
         }
     }
     
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    
     /**
-     * Validates create group form
+     * Shows error message
      */
-    function validateGroupForm() {
-        const groupName = groupNameInput.value.trim();
-        const errorElement = document.getElementById('group-name-error');
-        
-        // Clear previous errors
-        if (errorElement) {
-            errorElement.textContent = '';
-        }
-        
-        // Validate name
-        if (!groupName) {
-            showFormError(errorElement, 'Group name is required');
-            groupNameInput.focus();
-            return false;
-        }
-        
-        if (groupName.length < 3) {
-            showFormError(errorElement, 'Group name must be at least 3 characters');
-            groupNameInput.focus();
-            return false;
-        }
-        
-        if (groupName.length > 50) {
-            showFormError(errorElement, 'Group name must be less than 50 characters');
-            groupNameInput.focus();
-            return false;
-        }
-        
-        return true;
-    }
-    
-    function showFormError(element, message) {
-        if (element) {
-            element.textContent = message;
-            element.style.display = 'block';
-        }
-    }
-    
-    // Clear errors on input
-    if (groupNameInput) {
-        groupNameInput.addEventListener('input', () => {
-            const errorElement = document.getElementById('group-name-error');
-            if (errorElement) {
-                errorElement.textContent = '';
-                errorElement.style.display = 'none';
-            }
-        });
-    }
-    
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-    
-    function showSuccess(message) {
+    function showError(message) {
         const alert = document.createElement('div');
-        alert.className = 'alert alert-success';
-        alert.innerHTML = `
-            <span class="alert-icon">✓</span>
-            <span class="alert-message">${message}</span>
-        `;
+        alert.className = 'alert alert-error';
+        alert.textContent = message;
         alert.style.cssText = `
             position: fixed;
-            top: 5rem;
-            right: 1rem;
-            z-index: 1000;
-            background-color: #f0fff4;
-            border: 1px solid #48bb78;
-            color: #22543d;
-            padding: 1rem;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 1rem 1.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: slideInRight 0.3s ease-out;
+            z-index: 1000000;
+            animation: slideIn 0.3s ease-out;
         `;
         
         document.body.appendChild(alert);
@@ -345,28 +381,27 @@ document.addEventListener('DOMContentLoaded', () => {
             alert.style.transition = 'opacity 0.3s';
             alert.style.opacity = '0';
             setTimeout(() => alert.remove(), 300);
-        }, 3000);
+        }, 5000);
     }
     
-    function showError(message) {
+    /**
+     * Shows success message
+     */
+    function showSuccess(message) {
         const alert = document.createElement('div');
-        alert.className = 'alert alert-error';
-        alert.innerHTML = `
-            <span class="alert-icon">⚠️</span>
-            <span class="alert-message">${message}</span>
-        `;
+        alert.className = 'alert alert-success';
+        alert.textContent = message;
         alert.style.cssText = `
             position: fixed;
-            top: 5rem;
-            right: 1rem;
-            z-index: 1000;
-            background-color: #fff5f5;
-            border: 1px solid #fc8181;
-            color: #c53030;
-            padding: 1rem;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: slideInRight 0.3s ease-out;
+            z-index: 1000000;
+            animation: slideIn 0.3s ease-out;
         `;
         
         document.body.appendChild(alert);
@@ -388,21 +423,23 @@ document.addEventListener('DOMContentLoaded', () => {
             document.activeElement.tagName !== 'TEXTAREA') {
             
             if (e.key === 'ArrowLeft') {
-                leftArrow?.click();
+                scrollToPrevious();
             } else if (e.key === 'ArrowRight') {
-                rightArrow?.click();
+                scrollToNext();
             }
         }
         
         // Ctrl/Cmd + N to create new group
         if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
             e.preventDefault();
-            createGroupCard?.click();
+            if (createGroupCard) {
+                openModal('create-group-modal');
+            }
         }
     });
     
     // ============================================
-    // TOUCH/SWIPE SUPPORT (MOBILE)
+    // TOUCH/SWIPE SUPPORT
     // ============================================
     
     if (carousel) {
@@ -411,26 +448,45 @@ document.addEventListener('DOMContentLoaded', () => {
         
         carousel.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
-        });
+        }, { passive: true });
         
         carousel.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
-        });
+        }, { passive: true });
         
         function handleSwipe() {
             const swipeThreshold = 50;
             
             if (touchStartX - touchEndX > swipeThreshold) {
-                // Swiped left
-                rightArrow?.click();
+                // Swiped left - go next
+                scrollToNext();
             }
             
             if (touchEndX - touchStartX > swipeThreshold) {
-                // Swiped right
-                leftArrow?.click();
+                // Swiped right - go previous
+                scrollToPrevious();
             }
         }
     }
+    
+    // ============================================
+    // WINDOW RESIZE HANDLER
+    // ============================================
+    
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            detectActiveCard();
+            updateArrowStates();
+        }, 250);
+    });
+    
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    
+    initializeCarousel();
     
 });
