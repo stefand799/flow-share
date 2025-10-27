@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
             addMemberSubmitBtn.disabled = true;
             addMemberSubmitBtn.textContent = 'Adding...';
             
-            const response = await fetch(`/api/groups/${groupId}/add-member`, {
+            // Updated endpoint to match the new route
+            const response = await fetch(`/api/members/group/${groupId}/add-by-username`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username })
@@ -153,16 +154,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (deleteGroupBtn) {
         deleteGroupBtn.addEventListener('click', () => {
             openModal('delete-group-modal');
-            if (deleteGroupConfirmationInput) {
-                deleteGroupConfirmationInput.value = '';
-            }
         });
     }
     
     if (deleteGroupConfirmationInput) {
         deleteGroupConfirmationInput.addEventListener('input', () => {
-            const isConfirmed = deleteGroupConfirmationInput.value.toUpperCase() === 'DELETE';
-            confirmDeleteGroupBtn.disabled = !isConfirmed;
+            const confirmationText = deleteGroupConfirmationInput.value.trim().toUpperCase();
+            confirmDeleteGroupBtn.disabled = confirmationText !== 'DELETE';
         });
     }
     
@@ -174,12 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function deleteGroup() {
         try {
+            const confirmationText = deleteGroupConfirmationInput.value.trim().toUpperCase();
+            
+            if (confirmationText !== 'DELETE') {
+                showError('delete-confirmation-error', 'Please type DELETE to confirm');
+                return;
+            }
+            
             confirmDeleteGroupBtn.disabled = true;
             confirmDeleteGroupBtn.textContent = 'Deleting...';
             
             const response = await fetch(`/api/groups/${groupId}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                method: 'DELETE'
             });
             
             if (!response.ok) {
@@ -187,9 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(error.message || 'Failed to delete group');
             }
             
-            closeModal('delete-group-modal');
-            alert('Group deleted successfully. Redirecting to home...');
-            window.location.href = '/home';
+            window.dashboardUtils?.showSuccess('Group deleted successfully! Redirecting...');
+            
+            setTimeout(() => {
+                window.location.href = '/home';
+            }, 1500);
             
         } catch (error) {
             console.error('Error deleting group:', error);
@@ -211,19 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Clear errors on input
-    if (memberUsernameInput) {
-        memberUsernameInput.addEventListener('input', () => {
-            const errorElement = document.getElementById('member-username-error');
-            if (errorElement) errorElement.textContent = '';
-        });
-    }
-    
-    if (editGroupNameInput) {
-        editGroupNameInput.addEventListener('input', () => {
-            const errorElement = document.getElementById('group-name-error');
-            if (errorElement) errorElement.textContent = '';
-        });
+    function clearError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
     }
     
 });

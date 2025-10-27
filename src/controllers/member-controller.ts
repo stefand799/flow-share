@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as MemberService from "../services/member-service";
+import * as UserService from "../services/user-service";
 import { GroupMember, User } from "../generated/prisma";
 
 interface AuthenticateRequest extends Request {
@@ -42,7 +43,7 @@ export const handleGetMembers = async (req: AuthenticateRequest, res: Response) 
 
 /**
  * POST /api/members
- * Add a member to a group
+ * Add a member to a group (by userId)
  */
 export const handleAddMember = async (req: AuthenticateRequest, res: Response) => {
     const authenticatedUserId = req.user?.id;
@@ -81,6 +82,80 @@ export const handleAddMember = async (req: AuthenticateRequest, res: Response) =
         });
     } catch (err: any) {
         console.error("Error in handleAddMember:", err);
+        return res.status(500).json({ 
+            message: "An error occurred while adding the member." 
+        });
+    }
+};
+
+/**
+ * POST /api/members/group/:groupId/add-by-username
+ * Add a member to a group by searching for their username
+ */
+export const handleAddMemberByUsername = async (req: AuthenticateRequest, res: Response) => {
+    const authenticatedUserId = req.user?.id;
+    const groupId = parseInt(req.params.groupId);
+    const { username } = req.body;
+
+    if (!authenticatedUserId) {
+        return res.status(401).json({ 
+            message: "Authentication required." 
+        });
+    }
+
+    if (isNaN(groupId)) {
+        return res.status(400).json({ 
+            message: "Invalid group ID format." 
+        });
+    }
+
+    if (!username || typeof username !== 'string' || username.trim() === '') {
+        return res.status(400).json({ 
+            message: "Username is required." 
+        });
+    }
+
+    try {
+        // Search for user by username
+        const userToAdd = await UserService.findUserByUsername(username.trim());
+
+        if (!userToAdd) {
+            return res.status(404).json({ 
+                message: `User with username "${username}" not found.` 
+            });
+        }
+
+        // Check if user is already a member of the group
+        const existingMembers = await MemberService.getGroupMembers(groupId);
+        const isAlreadyMember = existingMembers.some(member => member.userId === userToAdd.id);
+
+        if (isAlreadyMember) {
+            return res.status(409).json({ 
+                message: `User "${username}" is already a member of this group.` 
+            });
+        }
+
+        // Add the member to the group
+        const memberToAdd: GroupMember = {
+            userId: userToAdd.id,
+            groupId: groupId,
+            isAdmin: false
+        } as GroupMember;
+
+        const createdMember = await MemberService.addMember(memberToAdd);
+
+        if (!createdMember) {
+            return res.status(500).json({ 
+                message: "Failed to add member to group." 
+            });
+        }
+
+        return res.status(201).json({ 
+            message: `User "${username}" added successfully to the group.`,
+            member: createdMember 
+        });
+    } catch (err: any) {
+        console.error("Error in handleAddMemberByUsername:", err);
         return res.status(500).json({ 
             message: "An error occurred while adding the member." 
         });

@@ -17,6 +17,7 @@ import authRoutes from './routes/auth-routes';
 // API routes (RESTful endpoints)
 import userRoutes from './routes/user-routes';
 import groupRoutes from './routes/group-routes';
+import memberRoutes from './routes/member-routes';  // Member management routes
 import taskRoutes from './routes/task-routes';
 import expenseRoutes from './routes/expense-routes';
 import contributionRoutes from './routes/contribution-routes';
@@ -85,6 +86,12 @@ app.use('/api/users', userRoutes);
 // Group management API
 // Handles: POST, GET, PUT, DELETE /api/groups
 app.use('/api/groups', groupRoutes);
+
+// Member management API
+// Handles: GET /api/members/group/:groupId, POST /api/members, 
+//          DELETE /api/members/:memberId, PUT /api/members/:memberId/promote, 
+//          PUT /api/members/:memberId/demote
+app.use('/api/members', memberRoutes);
 
 // Task management API (Kanban)
 // Handles: POST, GET, PUT, DELETE /api/tasks

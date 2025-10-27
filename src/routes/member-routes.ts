@@ -9,8 +9,11 @@ const router = Router();
 // GET /api/members/group/:groupId - Get all members of a group
 router.get("/group/:groupId", authenticate, MemberController.handleGetMembers);
 
-// POST /api/members - Add a member to a group
+// POST /api/members - Add a member to a group (by userId)
 router.post("/", authenticate, MemberController.handleAddMember);
+
+// POST /api/members/group/:groupId/add-by-username - Add member by username
+router.post("/group/:groupId/add-by-username", authenticate, MemberController.handleAddMemberByUsername);
 
 // DELETE /api/members/:memberId - Remove a member from a group
 router.delete("/:memberId", authenticate, MemberController.handleRemoveMember);
