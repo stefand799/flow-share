@@ -216,38 +216,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Contribute Button
         if (e.target.closest('.contribute-btn') && expenseId) {
-            try {
-                // Fetch expense data
-                const response = await fetch(`/api/expenses/${expenseId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch expense data');
-                }
-                
-                const { expense } = await response.json();
-                
-                // Calculate balance
-                const totalContributed = expense.contributions
-                    ? expense.contributions.reduce((sum, c) => sum + c.value, 0)
-                    : 0;
-                const balance = expense.value - totalContributed;
-                
-                // Populate contribution form
-                document.getElementById('contribution-expense-id').value = expense.id;
-                document.getElementById('contribution-expense-title').textContent = expense.title;
-                document.getElementById('contribution-expense-balance').textContent = 
-                    `${balance.toFixed(2)} ${expense.currency}`;
-                document.getElementById('contribution-value').max = balance;
-                
-                if (contributionForm) {
-                    contributionForm.reset();
-                }
-                showModal(contributionModal);
-            } catch (error) {
-                console.error('Error fetching expense:', error);
-                alert('Failed to load expense data. Please try again.');
-            }
+    try {
+        // Fetch expense data
+        const response = await fetch(`/api/expenses/${expenseId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch expense data');
+        }
+        
+        const { expense } = await response.json();
+        
+        // Calculate balance
+        const totalContributed = expense.contributions
+            ? expense.contributions.reduce((sum, c) => sum + c.value, 0)
+            : 0;
+        const balance = expense.value - totalContributed;
+        
+        // Prevent contribution if already paid
+        if (balance <= 0) {
+            alert('This expense is already fully paid!');
             return;
         }
+        
+        // Populate contribution form with enhanced info
+        document.getElementById('contribution-expense-id').value = expense.id;
+        document.getElementById('contribution-group-id').value = groupID;
+        document.getElementById('contribution-expense-title').textContent = expense.title;
+        document.getElementById('contribution-expense-total').textContent = 
+            `${expense.value.toFixed(2)} ${expense.currency}`;
+        document.getElementById('contribution-expense-contributed').textContent = 
+            `${totalContributed.toFixed(2)} ${expense.currency}`;
+        document.getElementById('contribution-expense-balance').textContent = 
+            `${balance.toFixed(2)} ${expense.currency}`;
+        document.getElementById('max-contribution-hint').textContent = 
+            `${balance.toFixed(2)} ${expense.currency}`;
+        
+        // Set max value for input
+        const contributionInput = document.getElementById('contribution-value');
+        contributionInput.max = balance.toFixed(2);
+        contributionInput.value = '';
+        
+        if (contributionForm) {
+            contributionForm.reset();
+            // Re-populate hidden fields after reset
+            document.getElementById('contribution-expense-id').value = expense.id;
+            document.getElementById('contribution-group-id').value = groupID;
+        }
+        
+        showModal(contributionModal);
+    } catch (error) {
+        console.error('Error fetching expense:', error);
+        alert('Failed to load expense data. Please try again.');
+    }
+    return;
+}
 
         // Delete Button
         if (e.target.closest('.delete-expense-btn') && expenseId) {
@@ -336,31 +357,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Contribution Form
     if (contributionForm) {
-        contributionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    contributionForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const formData = new FormData(contributionForm);
-            const contributionData = Object.fromEntries(formData.entries());
+        const formData = new FormData(contributionForm);
+        const contributionData = Object.fromEntries(formData.entries());
+        
+        // Convert value to number
+        const contributionValue = parseFloat(contributionData.value);
+        contributionData.value = contributionValue;
+        
+        // Convert expenseId to number
+        contributionData.expenseId = parseInt(contributionData.expenseId);
+        
+        // Convert groupId to number
+        contributionData.groupId = parseInt(contributionData.groupId);
+        
+        // Get max allowed contribution
+        const maxContribution = parseFloat(document.getElementById('contribution-value').max);
+        
+        // Validate contribution amount
+        if (isNaN(contributionValue) || contributionValue <= 0) {
+            alert('Please enter a valid contribution amount greater than 0.');
+            return;
+        }
+        
+        if (contributionValue > maxContribution) {
+            alert(`Your contribution cannot exceed the remaining balance of ${maxContribution.toFixed(2)}.`);
+            return;
+        }
+        
+        try {
+            await apiCall('/api/contributions', 'POST', contributionData);
             
-            // Convert value to number
-            contributionData.value = parseFloat(contributionData.value);
+            console.log('Contribution submitted successfully');
             
-            // Convert expenseId to number
-            contributionData.expenseId = parseInt(contributionData.expenseId);
+            hideModal(contributionModal);
             
-            try {
-                await apiCall('/api/contributions', 'POST', contributionData);
-                
-                console.log('Contribution submitted successfully');
-                
-                hideModal(contributionModal);
-                
-                // Reload to reflect new contributions and updated balance/status
-                window.location.reload();
-            } catch (error) {
-                console.error('Contribution Save Failed:', error.message);
-                alert('Failed to submit contribution. Please try again.');
-            }
-        });
-    }
+            // Reload to reflect new contributions and updated balance/status
+            window.location.reload();
+        } catch (error) {
+            console.error('Contribution Save Failed:', error.message);
+            alert('Failed to submit contribution. Please try again.');
+        }
+    });
+}
 });
+
+const recurringCheckbox = document.getElementById('expense-recurring');
+const recurrenceGroup = document.getElementById('recurrence-group');
+
+if (recurringCheckbox && recurrenceGroup) {
+    recurringCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            recurrenceGroup.style.display = 'block';
+            document.getElementById('expense-recurrence').required = true;
+        } else {
+            recurrenceGroup.style.display = 'none';
+            document.getElementById('expense-recurrence').required = false;
+            document.getElementById('expense-recurrence').value = 'NONE';
+        }
+    });
+}

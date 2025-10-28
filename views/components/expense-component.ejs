@@ -7,7 +7,7 @@
      - Create/Edit expenses
      - Add contributions
      - Track payment status
-     - View expense details
+     - View expense details with progress
 ============================================ -->
 
 <div id="expense-management-container" data-group-id="<%= group.id %>" class="expense-wrapper">
@@ -30,6 +30,7 @@
                     : 0;
                 const balance = expense.value - totalContributed;
                 const isPaid = balance <= 0;
+                const contributionPercentage = Math.min(100, (totalContributed / expense.value) * 100);
             %>
                 <div class="expense-card <%= isPaid ? 'border-green-500' : 'border-red-500' %>" 
                      data-expense-id="<%= expense.id %>">
@@ -40,13 +41,13 @@
                             <div class="expense-title-row">
                                 <h4 class="expense-title"><%= expense.title %></h4>
                                 <span class="expense-status <%= isPaid ? 'status-paid' : 'status-pending' %>">
-                                    <%= isPaid ? '✓ Paid' : '⏳ Pending' %>
+                                    <%= isPaid ? '✓ Fully Paid' : '⏳ Pending' %>
                                 </span>
                             </div>
                             
                             <div class="expense-meta">
                                 <span class="expense-amount">
-                                    <%= expense.value.toFixed(2) %> <%= expense.currency %>
+                                    Total: <%= expense.value.toFixed(2) %> <%= expense.currency %>
                                 </span>
                                 <% if (expense.due) { %>
                                     <span class="expense-due">
@@ -60,10 +61,27 @@
                                 <% } %>
                             </div>
 
-                            <div class="expense-balance">
-                                Balance: <span class="<%= isPaid ? 'text-green-600' : 'text-red-600' %>">
-                                    <%= balance.toFixed(2) %> <%= expense.currency %>
-                                </span>
+                            <!-- Progress Bar -->
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: <%= contributionPercentage %>%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="contributed-amount">
+                                        <%= totalContributed.toFixed(2) %> <%= expense.currency %> contributed
+                                    </span>
+                                    <% if (!isPaid) { %>
+                                        <span class="remaining-amount">
+                                            <%= balance.toFixed(2) %> <%= expense.currency %> remaining
+                                        </span>
+                                    <% } else { %>
+                                        <span class="remaining-amount text-green-600">
+                                            <%= isPaid && totalContributed > expense.value ? 
+                                                `+${(totalContributed - expense.value).toFixed(2)}` : 
+                                                'Complete' %> 
+                                        </span>
+                                    <% } %>
+                                </div>
                             </div>
                         </div>
 
@@ -84,23 +102,46 @@
 
                         <!-- Contributions List -->
                         <div class="contributions-section">
-                            <h5 class="contributions-title">Contributions</h5>
+                            <h5 class="contributions-title">
+                                Contributions (<%= expense.contributions ? expense.contributions.length : 0 %>)
+                            </h5>
                             <% if (expense.contributions && expense.contributions.length > 0) { %>
                                 <ul class="contributions-list">
                                     <% expense.contributions.forEach(contribution => { 
                                         const contributor = members.find(m => m.id === contribution.groupMemberId);
-                                        const username = contributor ? contributor.user.username : 'Unknown';
+                                        const username = contributor ? 
+                                            contributor.user.username : 'Unknown';
+                                        const contributionPercent = ((contribution.value / expense.value) * 100).toFixed(1);
                                     %>
                                         <li class="contribution-item">
-                                            <span class="contributor-name">👤 <%= username %></span>
+                                            <div class="contributor-info">
+                                                <span class="contributor-name">👤 <%= username %></span>
+                                                <span class="contributor-percent"><%= contributionPercent %>%</span>
+                                            </div>
                                             <span class="contribution-amount">
                                                 <%= contribution.value.toFixed(2) %> <%= expense.currency %>
                                             </span>
                                         </li>
                                     <% }) %>
                                 </ul>
+                                
+                                <!-- Contribution Summary -->
+                                <div class="contribution-summary">
+                                    <div class="summary-row">
+                                        <span>Total Contributed:</span>
+                                        <strong><%= totalContributed.toFixed(2) %> <%= expense.currency %></strong>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Expense Amount:</span>
+                                        <strong><%= expense.value.toFixed(2) %> <%= expense.currency %></strong>
+                                    </div>
+                                    <div class="summary-row <%= isPaid ? 'text-green-600' : 'text-red-600' %>">
+                                        <span><%= isPaid ? 'Overpayment:' : 'Still Needed:' %></span>
+                                        <strong><%= Math.abs(balance).toFixed(2) %> <%= expense.currency %></strong>
+                                    </div>
+                                </div>
                             <% } else { %>
-                                <p class="no-contributions">No contributions yet</p>
+                                <p class="no-contributions">No contributions yet. Be the first to contribute!</p>
                             <% } %>
                         </div>
 
@@ -108,12 +149,13 @@
                         <div class="expense-actions">
                             <% if (!isPaid) { %>
                                 <button class="btn-contribute contribute-btn" 
-                                        data-expense-id="<%= expense.id %>">
+                                        data-expense-id="<%= expense.id %>"
+                                        data-remaining="<%= balance.toFixed(2) %>">
                                     💵 Contribute
                                 </button>
                             <% } %>
                             
-                            <% if (currentMember.role === 'ADMIN' || currentMember.role === 'MODERATOR') { %>
+                            <% if (currentMember.isAdmin) { %>
                                 <button class="btn-edit edit-expense-btn" 
                                         data-expense-id="<%= expense.id %>">
                                     ✏️ Edit
@@ -179,39 +221,34 @@
                 <div class="form-group">
                     <label for="expense-currency">Currency *</label>
                     <select id="expense-currency" name="currency" required>
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="GBP">GBP (£)</option>
-                        <option value="RON" selected>RON (lei)</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="RON" selected>RON</option>
                     </select>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="expense-due">Due Date</label>
-                    <input type="date" id="expense-due" name="due">
-                </div>
-
-                <div class="form-group">
-                    <label for="expense-recurring">
-                        <input type="checkbox" 
-                               id="expense-recurring" 
-                               name="isRecurring"
-                               style="width: auto; margin-right: 0.5rem;">
-                        Recurring Expense
-                    </label>
-                </div>
+            <div class="form-group">
+                <label for="expense-due">Due Date</label>
+                <input type="date" id="expense-due" name="due">
             </div>
 
             <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" 
+                           id="expense-recurring" 
+                           name="isRecurring">
+                    <span>Recurring Expense</span>
+                </label>
+            </div>
+
+            <div class="form-group" id="recurrence-group" style="display: none;">
                 <label for="expense-recurrence">Recurrence Interval</label>
                 <select id="expense-recurrence" name="recurrenceInterval">
-                    <option value="">None</option>
+                    <option value="NONE">None</option>
                     <option value="DAILY">Daily</option>
                     <option value="WEEKLY">Weekly</option>
                     <option value="MONTHLY">Monthly</option>
-                    <option value="YEARLY">Yearly</option>
                 </select>
             </div>
 
@@ -234,14 +271,17 @@
         
         <div class="contribution-info">
             <p><strong>Expense:</strong> <span id="contribution-expense-title"></span></p>
-            <p><strong>Remaining Balance:</strong> <span id="contribution-expense-balance"></span></p>
+            <p><strong>Total Amount:</strong> <span id="contribution-expense-total"></span></p>
+            <p><strong>Already Contributed:</strong> <span id="contribution-expense-contributed"></span></p>
+            <p class="remaining-highlight"><strong>Still Needed:</strong> <span id="contribution-expense-balance"></span></p>
         </div>
 
         <form id="contribution-form">
             <input type="hidden" id="contribution-expense-id" name="expenseId">
+            <input type="hidden" id="contribution-group-id" name="groupId">
             
             <div class="form-group">
-                <label for="contribution-value">Contribution Amount *</label>
+                <label for="contribution-value">Your Contribution Amount *</label>
                 <input type="number" 
                        id="contribution-value" 
                        name="value" 
@@ -249,6 +289,7 @@
                        min="0.01"
                        step="0.01"
                        placeholder="0.00">
+                <small class="form-hint">Maximum: <span id="max-contribution-hint">0.00</span></small>
             </div>
 
             <div class="button-group">
