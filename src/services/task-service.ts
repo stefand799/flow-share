@@ -95,7 +95,7 @@ export const deleteTask = async (taskId: number): Promise<boolean> => {
  * @param groupId - The group's ID
  * @returns Array of tasks with assigned member details
  */
-export const getAllTasks = async (groupId: number): Promise<Task[]> => {
+export const getAllTasks = async (groupId: number): Promise<any[]> => {
     const tasks = await prisma.task.findMany({
         where: {
             groupId: groupId
@@ -109,7 +109,7 @@ export const getAllTasks = async (groupId: number): Promise<Task[]> => {
         }
     });
 
-    return tasks;
+    return tasks as any[];
 };
 
 /**

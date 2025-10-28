@@ -1,25 +1,252 @@
 <!-- ============================================
-     KANBAN COMPONENT - PLACEHOLDER
+     KANBAN COMPONENT - Task Board
      ============================================
      
-     Temporary placeholder for kanban board.
-     Shows task list without drag-and-drop.
+     Features:
+     - 3 columns: To Do, In Progress, Done
+     - Drag and drop between columns
+     - Task creation modal
+     - Claim/unclaim tasks
+     - Task details expansion
 ============================================ -->
 
-<div class="kanban-placeholder">
-    <div class="placeholder-message">
-        <h3>📋 Kanban Board</h3>
-        <p>Kanban board component is being implemented.</p>
-        <p>Tasks will appear here soon!</p>
+<div id="kanban-board-container" data-group-id="<%= group.id %>" class="kanban-board-wrapper">
+    
+    <!-- Header with Create Task Button -->
+    <div class="kanban-header">
+        <h3>Task Board</h3>
+        <button class="btn-primary create-task-btn" type="button">
+            + New Task
+        </button>
+    </div>
+
+    <!-- Kanban Columns Grid -->
+    <div class="kanban-columns-grid">
         
-        <% if (tasks && tasks.length > 0) { %>
-            <div class="task-count">
-                <strong><%= tasks.length %></strong> task<%= tasks.length !== 1 ? 's' : '' %> in this group
+        <!-- TO DO Column -->
+        <div class="kanban-column" data-stage="TO_DO">
+            <div class="column-header">
+                <h4 class="column-title">📝 To Do</h4>
+                <span class="task-count" id="count-TO_DO">
+                    <%= tasks.filter(t => t.stage === 'TO_DO').length %>
+                </span>
             </div>
-        <% } else { %>
-            <div class="empty-state">
-                <p>No tasks yet. Create your first task!</p>
+            <div class="task-list" data-stage="TO_DO">
+                <% tasks.filter(t => t.stage === 'TO_DO').forEach(task => { %>
+                    <div class="task-card" 
+                         draggable="true"
+                         data-task-id="<%= task.id %>"
+                         data-member-id="<%= task.groupMemberId || '' %>">
+                        
+                        <!-- Task Header -->
+                        <div class="task-header">
+                            <h5 class="task-title"><%= task.name %></h5>
+                        </div>
+
+                        <!-- Task Info (Always Visible) -->
+                        <div class="task-info">
+                            <% if (task.due) { %>
+                                <div class="task-due">
+                                    📅 <%= new Date(task.due).toLocaleDateString() %>
+                                </div>
+                            <% } %>
+                            <div class="task-assigned">
+                                👤 <span class="assigned-user-name <%= task.groupMemberId ? 'text-blue-600' : 'text-red-500' %>">
+                                    <% if (task.groupMemberId) { %>
+                                        <%= members.find(m => m.id === task.groupMemberId)?.user.username || 'Unassigned' %>
+                                    <% } else { %>
+                                        Unassigned
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Details (Initially Hidden) -->
+                        <div class="task-details-expanded hidden">
+                            <% if (task.description) { %>
+                                <p class="task-description"><%= task.description %></p>
+                            <% } %>
+                            
+                            <!-- Action Buttons -->
+                            <div class="task-actions">
+                                <% if (!task.groupMemberId) { %>
+                                    <button class="action-btn claim-btn" 
+                                            data-task-id="<%= task.id %>" 
+                                            data-action="claim">
+                                        Claim Task
+                                    </button>
+                                <% } else if (task.groupMemberId === currentMember.id) { %>
+                                    <button class="action-btn unclaim-btn" 
+                                            data-task-id="<%= task.id %>" 
+                                            data-action="unclaim">
+                                        Unclaim
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
             </div>
-        <% } %>
+        </div>
+
+        <!-- IN PROGRESS Column -->
+        <div class="kanban-column" data-stage="IN_PROGRESS">
+            <div class="column-header">
+                <h4 class="column-title">⚡ In Progress</h4>
+                <span class="task-count" id="count-IN_PROGRESS">
+                    <%= tasks.filter(t => t.stage === 'IN_PROGRESS').length %>
+                </span>
+            </div>
+            <div class="task-list" data-stage="IN_PROGRESS">
+                <% tasks.filter(t => t.stage === 'IN_PROGRESS').forEach(task => { %>
+                    <div class="task-card" 
+                         draggable="true"
+                         data-task-id="<%= task.id %>"
+                         data-member-id="<%= task.groupMemberId || '' %>">
+                        
+                        <!-- Task Header -->
+                        <div class="task-header">
+                            <h5 class="task-title"><%= task.name %></h5>
+                        </div>
+
+                        <!-- Task Info -->
+                        <div class="task-info">
+                            <% if (task.due) { %>
+                                <div class="task-due">
+                                    📅 <%= new Date(task.due).toLocaleDateString() %>
+                                </div>
+                            <% } %>
+                            <div class="task-assigned">
+                                👤 <span class="assigned-user-name <%= task.groupMemberId ? 'text-blue-600' : 'text-red-500' %>">
+                                    <% if (task.groupMemberId) { %>
+                                        <%= members.find(m => m.id === task.groupMemberId)?.user.username || 'Unassigned' %>
+                                    <% } else { %>
+                                        Unassigned
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Details -->
+                        <div class="task-details-expanded hidden">
+                            <% if (task.description) { %>
+                                <p class="task-description"><%= task.description %></p>
+                            <% } %>
+                            
+                            <div class="task-actions">
+                                <% if (!task.groupMemberId) { %>
+                                    <button class="action-btn claim-btn" 
+                                            data-task-id="<%= task.id %>" 
+                                            data-action="claim">
+                                        Claim Task
+                                    </button>
+                                <% } else if (task.groupMemberId === currentMember.id) { %>
+                                    <button class="action-btn unclaim-btn" 
+                                            data-task-id="<%= task.id %>" 
+                                            data-action="unclaim">
+                                        Unclaim
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- DONE Column -->
+        <div class="kanban-column" data-stage="DONE">
+            <div class="column-header">
+                <h4 class="column-title">✅ Done</h4>
+                <span class="task-count" id="count-DONE">
+                    <%= tasks.filter(t => t.stage === 'DONE').length %>
+                </span>
+            </div>
+            <div class="task-list" data-stage="DONE">
+                <% tasks.filter(t => t.stage === 'DONE').forEach(task => { %>
+                    <div class="task-card done" 
+                         draggable="true"
+                         data-task-id="<%= task.id %>"
+                         data-member-id="<%= task.groupMemberId || '' %>">
+                        
+                        <!-- Task Header -->
+                        <div class="task-header">
+                            <h5 class="task-title"><%= task.name %></h5>
+                        </div>
+
+                        <!-- Task Info -->
+                        <div class="task-info">
+                            <% if (task.due) { %>
+                                <div class="task-due">
+                                    📅 <%= new Date(task.due).toLocaleDateString() %>
+                                </div>
+                            <% } %>
+                            <div class="task-assigned">
+                                👤 <span class="assigned-user-name <%= task.groupMemberId ? 'text-blue-600' : 'text-red-500' %>">
+                                    <% if (task.groupMemberId) { %>
+                                        <%= members.find(m => m.id === task.groupMemberId)?.user.username || 'Unassigned' %>
+                                    <% } else { %>
+                                        Unassigned
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Details -->
+                        <div class="task-details-expanded hidden">
+                            <% if (task.description) { %>
+                                <p class="task-description"><%= task.description %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<!-- Create Task Modal -->
+<div id="create-task-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3 class="modal-title">Create New Task</h3>
+        
+        <form id="create-task-form">
+            <div class="form-group">
+                <label for="task-name">Task Name *</label>
+                <input type="text" 
+                       id="task-name" 
+                       name="name" 
+                       required 
+                       maxlength="100"
+                       placeholder="Enter task name">
+            </div>
+
+            <div class="form-group">
+                <label for="task-description">Description</label>
+                <textarea id="task-description" 
+                          name="description" 
+                          rows="3"
+                          maxlength="500"
+                          placeholder="Add task description (optional)"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="task-due">Due Date *</label>
+                <input type="date" id="task-due" name="due" required>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="cancel-task-create-btn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary">
+                    Create Task
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Component-specific JavaScript -->
+<script src="/js/components/kanban-component.js"></script>

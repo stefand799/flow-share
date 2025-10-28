@@ -1,164 +1,430 @@
+/* ============================================
+   KANBAN-COMPONENT.CSS - Kanban Board Styles
+   ============================================ */
+
+/* ============================================
+   BOARD WRAPPER
+============================================ */
+
 .kanban-board-wrapper {
-padding: 20px;
-background-color: #f7fafc;
-border-radius: 8px;
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
 }
 
+.kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.kanban-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+}
+
+/* ============================================
+   COLUMNS GRID
+============================================ */
+
 .kanban-columns-grid {
-display: grid;
-grid-template-columns: repeat(1, 1fr);
-gap: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
-.kanban-columns-grid {
-grid-template-columns: repeat(3, 1fr);
-}
+    .kanban-columns-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
+/* ============================================
+   COLUMNS
+============================================ */
+
 .kanban-column {
-background-color: #ffffff;
-border-radius: 8px;
-padding: 1rem;
-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-min-height: 400px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    min-height: 400px;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .column-title {
-font-size: 1.25rem;
-font-weight: 600;
-margin-bottom: 1rem;
-padding-bottom: 0.5rem;
-border-bottom: 2px solid #e2e8f0;
-color: #2d3748;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
 }
 
+.task-count {
+    background-color: #edf2f7;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* ============================================
+   TASK LIST
+============================================ */
+
 .task-list {
-min-height: 350px;
+    min-height: 350px;
+    padding: 0.5rem 0;
 }
 
 .task-list.drag-over {
-background-color: #e9f0f7;
-border: 2px dashed #4299e1;
-border-radius: 6px;
+    background-color: #ebf4ff;
+    border: 2px dashed #4299e1;
+    border-radius: 6px;
+    min-height: 360px;
 }
 
+/* ============================================
+   TASK CARDS
+============================================ */
+
 .task-card {
-background-color: #f7fafc;
-border-radius: 6px;
-padding: 1rem;
-margin-bottom: 0.75rem;
-cursor: pointer;
-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-transition: transform 0.2s, box-shadow 0.2s;
-border-left: 5px solid;
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid;
+    position: relative;
 }
 
 .task-card:hover {
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
 
+.task-card:active {
+    cursor: grabbing;
+}
+
+.task-card.is-dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    cursor: grabbing;
+}
+
+/* Priority Colors */
 .task-card.low {
-border-left-color: #48bb78;
-}
-.task-card.medium {
-border-left-color: #ecc94b;
-}
-.task-card.high {
-border-left-color: #f56565;
+    border-left-color: #48bb78;
 }
 
-.task-card:active, .task-card.is-dragging {
-opacity: 0.5;
-transform: scale(0.98);
+.task-card.medium {
+    border-left-color: #ecc94b;
+}
+
+.task-card.high {
+    border-left-color: #f56565;
+}
+
+/* Done tasks styling */
+.task-card.done {
+    opacity: 0.8;
+    background-color: #f7fafc;
+}
+
+.task-card.done .task-title {
+    text-decoration: line-through;
+    color: #a0aec0;
+}
+
+/* ============================================
+   TASK CARD CONTENT
+============================================ */
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
 }
 
 .task-title {
-font-size: 1rem;
-margin-bottom: 0.25rem;
-line-height: 1.3;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
 }
 
+.priority-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.priority-badge.low {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.priority-badge.medium {
+    background-color: #fefcbf;
+    color: #744210;
+}
+
+.priority-badge.high {
+    background-color: #fed7d7;
+    color: #742a2a;
+}
+
+/* ============================================
+   TASK INFO
+============================================ */
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.task-due {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.task-assigned {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.assigned-user-name {
+    font-weight: 500;
+}
+
+.text-blue-600 {
+    color: #3182ce;
+}
+
+.text-red-500 {
+    color: #e53e3e;
+}
+
+/* ============================================
+   EXPANDABLE DETAILS
+============================================ */
+
+.task-details-expanded {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.task-details-expanded.hidden {
+    display: none;
+}
+
+.task-description {
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
+    margin: 0 0 0.75rem 0;
+    white-space: pre-wrap;
+}
+
+.task-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.claim-btn {
+    background-color: #4299e1;
+    color: white;
+}
+
+.claim-btn:hover {
+    background-color: #3182ce;
+}
+
+.unclaim-btn {
+    background-color: #fc8181;
+    color: white;
+}
+
+.unclaim-btn:hover {
+    background-color: #f56565;
+}
+
+/* ============================================
+   MODAL
+============================================ */
+
 .modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.5);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .modal.hidden {
-display: none;
+    display: none;
 }
 
 .modal-content {
-background: white;
-padding: 2rem;
-border-radius: 8px;
-max-width: 500px;
-width: 90%;
-box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
 }
 
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 1.5rem 0;
+}
+
+/* ============================================
+   FORM STYLES
+============================================ */
+
 .form-group {
-margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
-display: block;
-font-weight: 600;
-margin-bottom: 0.5rem;
-color: #4a5568;
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-size: 0.875rem;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
-width: 100%;
-padding: 0.75rem;
-border: 1px solid #e2e8f0;
-border-radius: 4px;
-box-sizing: border-box;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.875rem;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 .button-group {
-display: flex;
-justify-content: flex-end;
-gap: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
+/* ============================================
+   BUTTONS
+============================================ */
+
 .btn-primary {
-background-color: #4c51bf;
-color: white;
-padding: 0.75rem 1.5rem;
-border-radius: 4px;
-font-weight: 600;
-transition: background-color 0.2s;
+    background-color: #4c51bf;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.875rem;
 }
 
 .btn-primary:hover {
-background-color: #434190;
+    background-color: #434190;
 }
 
 .btn-secondary {
-background-color: #edf2f7;
-color: #4a5568;
-padding: 0.75rem 1.5rem;
-border-radius: 4px;
-font-weight: 600;
-transition: background-color 0.2s;
+    background-color: #edf2f7;
+    color: #4a5568;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.875rem;
 }
 
 .btn-secondary:hover {
-background-color: #e2e8f0;
+    background-color: #e2e8f0;
 }
+
+/* ============================================
+   PLACEHOLDER (Keep for fallback)
+============================================ */
 
 .kanban-placeholder {
     background: white;
@@ -177,14 +443,6 @@ background-color: #e2e8f0;
 .placeholder-message p {
     color: #718096;
     margin: 0.5rem 0;
-}
-
-.task-count {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: #edf2f7;
-    border-radius: 8px;
-    font-size: 1.125rem;
 }
 
 .empty-state {

@@ -1,3 +1,15 @@
+// ============================================
+// EXPENSE-COMPONENT.JS - Expenses Tracker JavaScript
+// ============================================
+// 
+// Features:
+// - Create/Edit expenses
+// - Add contributions
+// - Delete expenses
+// - Toggle expense details
+// - Real-time UI updates
+// ============================================
+
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('expense-management-container');
     if (!container) return;
@@ -17,8 +29,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelExpenseBtn = document.getElementById('cancel-expense-btn');
     const cancelContributionBtn = document.getElementById('cancel-contribution-btn');
 
-    // --- Utility Functions ---
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
 
+    /**
+     * Makes an API call
+     * @param {string} url - API endpoint
+     * @param {string} method - HTTP method
+     * @param {object} payload - Request body
+     */
     const apiCall = async (url, method, payload) => {
         try {
             const response = await fetch(url, {
@@ -41,19 +61,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const showModal = (modalElement) => modalElement.classList.remove('hidden');
-    const hideModal = (modalElement) => modalElement.classList.add('hidden');
-
-    const resetExpenseForm = () => {
-        expenseForm.reset();
-        document.getElementById('expense-modal-title').textContent = 'Add New Expense';
-        document.getElementById('expense-id').value = '';
-        document.getElementById('submit-expense-btn').textContent = 'Save Expense';
+    /**
+     * Shows a modal
+     * @param {HTMLElement} modalElement - Modal to show
+     */
+    const showModal = (modalElement) => {
+        if (modalElement) {
+            modalElement.classList.remove('hidden');
+        }
     };
 
-    // --- Event Listeners: Expense Modals ---
+    /**
+     * Hides a modal
+     * @param {HTMLElement} modalElement - Modal to hide
+     */
+    const hideModal = (modalElement) => {
+        if (modalElement) {
+            modalElement.classList.add('hidden');
+        }
+    };
 
-    // 1. Show Add New Expense Modal
+    /**
+     * Resets the expense form
+     */
+    const resetExpenseForm = () => {
+        if (expenseForm) {
+            expenseForm.reset();
+        }
+        
+        const modalTitle = document.getElementById('expense-modal-title');
+        const expenseId = document.getElementById('expense-id');
+        const submitBtn = document.getElementById('submit-expense-btn');
+        
+        if (modalTitle) modalTitle.textContent = 'Add New Expense';
+        if (expenseId) expenseId.value = '';
+        if (submitBtn) submitBtn.textContent = 'Save Expense';
+    };
+
+    // ============================================
+    // MODAL CONTROLS
+    // ============================================
+
+    // Show Add New Expense Modal
     if (addNewExpenseBtn) {
         addNewExpenseBtn.addEventListener('click', () => {
             resetExpenseForm();
@@ -61,128 +110,256 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Hide Expense Modal
+    // Hide Expense Modal
     if (cancelExpenseBtn) {
-        cancelExpenseBtn.addEventListener('click', () => hideModal(expenseFormModal));
+        cancelExpenseBtn.addEventListener('click', () => {
+            hideModal(expenseFormModal);
+            resetExpenseForm();
+        });
     }
     
-    // 3. Hide Contribution Modal
+    // Hide Contribution Modal
     if (cancelContributionBtn) {
-        cancelContributionBtn.addEventListener('click', () => hideModal(contributionModal));
+        cancelContributionBtn.addEventListener('click', () => {
+            hideModal(contributionModal);
+            if (contributionForm) {
+                contributionForm.reset();
+            }
+        });
     }
 
+    // Close modals when clicking outside
+    if (expenseFormModal) {
+        expenseFormModal.addEventListener('click', (e) => {
+            if (e.target === expenseFormModal) {
+                hideModal(expenseFormModal);
+                resetExpenseForm();
+            }
+        });
+    }
 
-    // --- Event Listeners: Expense Management Actions ---
+    if (contributionModal) {
+        contributionModal.addEventListener('click', (e) => {
+            if (e.target === contributionModal) {
+                hideModal(contributionModal);
+                if (contributionForm) {
+                    contributionForm.reset();
+                }
+            }
+        });
+    }
+
+    // ============================================
+    // EXPENSE MANAGEMENT ACTIONS
+    // ============================================
 
     container.addEventListener('click', async (e) => {
-        // Find the closest expense card to determine the target expense ID
+        // Find the closest expense card
         const targetCard = e.target.closest('.expense-card');
         const expenseId = targetCard ? targetCard.dataset.expenseId : null;
 
-        // Toggle Details (Summary click)
+        // Toggle Details (clicking on summary)
         if (e.target.closest('.expense-summary')) {
-            const detailsId = e.target.closest('.expense-summary').dataset.toggleId;
+            const summary = e.target.closest('.expense-summary');
+            const detailsId = summary.dataset.toggleId;
             const detailsElement = document.getElementById(detailsId);
+            
             if (detailsElement) {
                 detailsElement.classList.toggle('hidden');
+                
+                // Rotate expand icon
+                const expandIcon = summary.querySelector('.expand-icon');
+                if (expandIcon) {
+                    expandIcon.style.transform = detailsElement.classList.contains('hidden') 
+                        ? 'rotate(0deg)' 
+                        : 'rotate(180deg)';
+                }
             }
+            return;
         }
         
         // Edit Button
         if (e.target.closest('.edit-expense-btn') && expenseId) {
-            // In a real app, you would fetch the expense data by ID here to populate the form
-            console.log(`Editing expense ${expenseId}. Fetching current data...`);
-            
-            // Placeholder: Populate form fields from visible card data for demo
-            const title = targetCard.querySelector('.expense-summary p:first-child').textContent;
-            
-            document.getElementById('expense-modal-title').textContent = 'Edit Expense';
-            document.getElementById('expense-id').value = expenseId;
-            document.getElementById('expense-title').value = title; 
-            document.getElementById('submit-expense-btn').textContent = 'Update Expense';
-            
-            showModal(expenseFormModal);
+            try {
+                // Fetch expense data
+                const response = await fetch(`/api/expenses/${expenseId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch expense data');
+                }
+                
+                const { expense } = await response.json();
+                
+                // Populate form
+                document.getElementById('expense-modal-title').textContent = 'Edit Expense';
+                document.getElementById('expense-id').value = expense.id;
+                document.getElementById('expense-title').value = expense.title;
+                document.getElementById('expense-description').value = expense.description || '';
+                document.getElementById('expense-value').value = expense.value;
+                document.getElementById('expense-currency').value = expense.currency;
+                
+                if (expense.due) {
+                    const dueDate = new Date(expense.due);
+                    document.getElementById('expense-due').value = dueDate.toISOString().split('T')[0];
+                }
+                
+                document.getElementById('expense-recurring').checked = expense.isRecurring;
+                document.getElementById('expense-recurrence').value = expense.recurrenceInterval || '';
+                document.getElementById('submit-expense-btn').textContent = 'Update Expense';
+                
+                showModal(expenseFormModal);
+            } catch (error) {
+                console.error('Error fetching expense:', error);
+                alert('Failed to load expense data. Please try again.');
+            }
+            return;
         }
 
         // Contribute Button
         if (e.target.closest('.contribute-btn') && expenseId) {
-            // In a real app, fetch expense details (title, balance, currency)
-            const summaryDiv = targetCard.querySelector('.expense-summary');
-            const title = summaryDiv.querySelector('.text-xl').textContent;
-            const balanceText = summaryDiv.querySelector('.text-sm:last-child span').textContent;
-            
-            document.getElementById('contribution-expense-id').value = expenseId;
-            document.getElementById('contribution-expense-title').textContent = title;
-            document.getElementById('contribution-expense-balance').textContent = balanceText;
-            document.getElementById('contribution-value').max = parseFloat(balanceText.replace(/[^\d.]/g, '')); // Set max value
-            contributionForm.reset();
-            showModal(contributionModal);
+            try {
+                // Fetch expense data
+                const response = await fetch(`/api/expenses/${expenseId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch expense data');
+                }
+                
+                const { expense } = await response.json();
+                
+                // Calculate balance
+                const totalContributed = expense.contributions
+                    ? expense.contributions.reduce((sum, c) => sum + c.value, 0)
+                    : 0;
+                const balance = expense.value - totalContributed;
+                
+                // Populate contribution form
+                document.getElementById('contribution-expense-id').value = expense.id;
+                document.getElementById('contribution-expense-title').textContent = expense.title;
+                document.getElementById('contribution-expense-balance').textContent = 
+                    `${balance.toFixed(2)} ${expense.currency}`;
+                document.getElementById('contribution-value').max = balance;
+                
+                if (contributionForm) {
+                    contributionForm.reset();
+                }
+                showModal(contributionModal);
+            } catch (error) {
+                console.error('Error fetching expense:', error);
+                alert('Failed to load expense data. Please try again.');
+            }
+            return;
         }
 
         // Delete Button
         if (e.target.closest('.delete-expense-btn') && expenseId) {
-            if (confirm(`Are you sure you want to delete expense ID: ${expenseId}?`)) {
+            const confirmed = confirm('Are you sure you want to delete this expense? This action cannot be undone.');
+            
+            if (confirmed) {
                 try {
-                    await apiCall(`/api/expenses/delete`, 'DELETE', { expenseId, groupId: groupID });
+                    await apiCall(`/api/expenses/${expenseId}`, 'DELETE', {});
                     
-                    // Simple UI update: remove the card and reload page
+                    // Remove card from DOM
                     targetCard.remove();
-                    window.location.reload(); 
+                    
+                    // Show success message
+                    console.log('Expense deleted successfully');
+                    
+                    // Check if no expenses left
+                    const remainingExpenses = container.querySelectorAll('.expense-card');
+                    if (remainingExpenses.length === 0) {
+                        window.location.reload();
+                    }
                 } catch (error) {
                     console.error('Delete failed:', error.message);
+                    alert('Failed to delete expense. Please try again.');
                 }
             }
+            return;
         }
     });
 
+    // ============================================
+    // FORM SUBMISSIONS
+    // ============================================
 
-    // --- Form Submissions ---
-
-    // 1. Expense Form (Create/Edit)
+    // Expense Form (Create/Edit)
     if (expenseForm) {
         expenseForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(expenseForm);
             const expenseData = Object.fromEntries(formData.entries());
-            expenseData.groupId = groupID;
+            
+            // Add groupId
+            expenseData.groupId = parseInt(groupID);
+            
+            // Convert checkbox to boolean
+            expenseData.isRecurring = expenseData.isRecurring === 'on';
+            
+            // Convert value to number
+            expenseData.value = parseFloat(expenseData.value);
+            
+            // Handle empty recurrence interval
+            if (!expenseData.recurrenceInterval) {
+                delete expenseData.recurrenceInterval;
+            }
+            
+            // Handle empty due date
+            if (!expenseData.due) {
+                delete expenseData.due;
+            }
             
             const isEdit = !!expenseData.id;
-            const url = isEdit ? `/api/expenses/update` : `/api/expenses/create`;
+            const url = isEdit ? `/api/expenses/${expenseData.id}` : `/api/expenses`;
             const method = isEdit ? 'PUT' : 'POST';
 
+            // Remove id from payload for create
+            if (!isEdit) {
+                delete expenseData.id;
+            }
+
             try {
-                await apiCall(url, method, expenseData);
+                const result = await apiCall(url, method, expenseData);
+                
+                console.log(`Expense ${isEdit ? 'updated' : 'created'} successfully`);
                 
                 hideModal(expenseFormModal);
                 resetExpenseForm();
-                // Reload to show changes (Simple method)
-                window.location.reload(); 
+                
+                // Reload page to show changes
+                window.location.reload();
             } catch (error) {
                 console.error('Expense Save Failed:', error.message);
+                alert(`Failed to ${isEdit ? 'update' : 'create'} expense. Please try again.`);
             }
         });
     }
 
-    // 2. Contribution Form
+    // Contribution Form
     if (contributionForm) {
         contributionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(contributionForm);
             const contributionData = Object.fromEntries(formData.entries());
-            contributionData.groupId = groupID;
             
-            // The expenseId is already in contributionData via hidden input
-
+            // Convert value to number
+            contributionData.value = parseFloat(contributionData.value);
+            
+            // Convert expenseId to number
+            contributionData.expenseId = parseInt(contributionData.expenseId);
+            
             try {
-                await apiCall(`/api/contributions/create`, 'POST', contributionData);
+                await apiCall('/api/contributions', 'POST', contributionData);
+                
+                console.log('Contribution submitted successfully');
                 
                 hideModal(contributionModal);
+                
                 // Reload to reflect new contributions and updated balance/status
-                window.location.reload(); 
+                window.location.reload();
             } catch (error) {
                 console.error('Contribution Save Failed:', error.message);
+                alert('Failed to submit contribution. Please try again.');
             }
         });
     }
