@@ -1,0 +1,282 @@
+.dashboard-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.page-header {
+  padding: 1.5rem 2rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-back {
+  background: #1e293b;
+  border: 2px solid #475569;
+  color: #d1d5db;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.btn-back:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border-color: #3b82f6;
+  color: white;
+  transform: translateX(-4px);
+}
+
+.header-title h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  margin: 0 0 0.25rem 0;
+}
+
+.header-title .subtitle {
+  font-size: 1rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr 3fr;
+    gap: 2.5rem;
+    padding: 0 2rem;
+  }
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 99;
+}
+
+@media (min-width: 1024px) {
+  .left-column {
+    position: sticky;
+    top: 6rem;
+    align-self: flex-start;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+  }
+}
+
+.group-section,
+.members-section {
+  background: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+  border: 1px solid #334155;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #d1d5db;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title .count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9ca3af;
+  background-color: #0f172a;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.right-column {
+  min-height: 600px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background: #1e293b;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid #334155;
+}
+
+.toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #0f172a;
+  color: #d1d5db;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+}
+
+.toggle-icon {
+  font-size: 1.5rem;
+}
+
+.toggle-text {
+  font-size: 1rem;
+}
+
+.content-container {
+  position: relative;
+  min-height: 500px;
+}
+
+.view-content {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.view-content.hidden {
+  display: none;
+  opacity: 0;
+}
+
+.view-content.active {
+  display: block;
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    gap: 1.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .page-header {
+    padding: 1rem 0.75rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-title h1 {
+    font-size: 1.75rem;
+  }
+
+  .header-title .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .left-column {
+    gap: 1.25rem;
+  }
+
+  .group-section,
+  .members-section {
+    padding: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    gap: 1.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .page-header {
+    padding: 0.75rem 0.5rem 0.5rem;
+  }
+
+  .header-left {
+    gap: 0.75rem;
+  }
+
+  .btn-back {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .header-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-title .subtitle {
+    font-size: 0.875rem;
+  }
+
+  .view-toggle {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .toggle-btn {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 0.5rem;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .btn-back {
+    align-self: flex-start;
+  }
+}

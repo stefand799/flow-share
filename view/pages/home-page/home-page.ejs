@@ -1,0 +1,29 @@
+<div class="home-page">
+    
+    <div class="page-header">
+        <h1>Welcome, <%= user.username %>!</h1>
+        <p class="subtitle">Manage your profile and groups</p>
+    </div>
+    
+    <div class="home-layout">
+        
+        <div class="profile-section">
+            <%- include('../../components/profile-component/profile-component', { user: user }) %>
+        </div>
+        
+        <div class="groups-section">
+            
+            <div class="section-header">
+                <h2>Your Groups</h2>
+                <span class="group-count"><%= groups.length %> group<%= groups.length !== 1 ? 's' : '' %></span>
+            </div>
+            
+            <%- include('../../components/groups-list-component/groups-list-component', { groups: groups, user: user }) %>
+            
+        </div>
+        
+    </div>
+    
+</div>
+
+<script src="/pages/home-page/home-page.js"></script>

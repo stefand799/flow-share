@@ -1,0 +1,155 @@
+.home-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 2rem 1rem 1rem;
+}
+
+.page-header h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #e5e7eb;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header .subtitle {
+  font-size: 1.125rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .home-layout {
+    grid-template-columns: 300px 1fr;
+    gap: 2.5rem;
+    padding: 0 2rem;
+  }
+}
+
+.profile-section {
+  position: relative;
+  width: 100%;
+  z-index: 99;
+}
+
+@media (min-width: 1024px) {
+  .profile-section {
+    position: sticky;
+    top: 5rem;
+    align-self: flex-start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+  }
+}
+
+.groups-section {
+  min-height: 400px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #334155;
+}
+
+.section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #d1d5db;
+  margin: 0;
+}
+
+.group-count {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #9ca3af;
+  background-color: #1e293b;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+@media (max-width: 1024px) {
+  .home-layout {
+    gap: 1.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .page-header {
+    padding: 1.5rem 0.75rem 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.875rem;
+  }
+
+  .page-header .subtitle {
+    font-size: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-layout {
+    gap: 1.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .page-header {
+    padding: 1rem 0.5rem 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.625rem;
+  }
+
+  .page-header .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
