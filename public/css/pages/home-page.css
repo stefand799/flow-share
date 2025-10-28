@@ -72,6 +72,7 @@
 .profile-section {
     position: relative;
     width: 100%;
+    z-index: 99;  /* The Engineer */
 }
 
 @media (min-width: 1024px) {
