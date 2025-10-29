@@ -1,0 +1,131 @@
+<div class="groups-list-container">
+    
+    <div class="carousel-wrapper">
+        
+        <button class="carousel-arrow carousel-arrow-left" id="carousel-left" type="button" aria-label="Previous groups">
+            &#10094;
+        </button>
+        
+        <div class="group-carousel" id="group-carousel">
+            
+            <% if (groups && groups.length > 0) { %>
+                <% groups.forEach(group => { %>
+                    <div class="group-card" data-group-id="<%= group.id %>">
+                        <div class="group-card-header">
+                            <h4 class="group-card-title"><%= group.name %></h4>
+                        </div>
+                        <div class="group-card-body">
+                            <p class="group-card-description">
+                                <%= group.description || 'No description' %>
+                            </p>
+                            <div class="group-card-meta">
+                                <span class="meta-item">
+                                    <span class="meta-icon">👥</span>
+                                    <span class="meta-text"><%= group._count?.Members || 0 %> members</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-icon">📋</span>
+                                    <span class="meta-text"><%= group._count?.Tasks || 0 %> tasks</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="group-card-footer">
+                            <span class="view-link">View Dashboard →</span>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <div class="group-card create-group-card" id="create-group-card">
+                <div class="create-icon">➕</div>
+                <h4>Create New Group</h4>
+                <p>Start collaborating with your team</p>
+            </div>
+            
+            <% if (!groups || groups.length === 0) { %>
+                <div class="empty-state-card">
+                    <div class="empty-icon">📭</div>
+                    <h4>No Groups Yet</h4>
+                    <p>Create your first group to get started!</p>
+                </div>
+            <% } %>
+            
+        </div>
+        
+        <button class="carousel-arrow carousel-arrow-right" id="carousel-right" type="button" aria-label="Next groups">
+            &#10095;
+        </button>
+        
+    </div>
+    
+    <div class="carousel-indicators" id="carousel-indicators"></div>
+    
+</div>
+
+<div id="create-group-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Group</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="create-group-form">
+                
+                <div class="form-group">
+                    <label for="group-name">Group Name *</label>
+                    <input 
+                        type="text" 
+                        id="group-name" 
+                        name="name"
+                        class="form-input"
+                        placeholder="Enter group name"
+                        required
+                        minlength="3"
+                        maxlength="50"
+                        autofocus
+                    >
+                    <small class="form-hint">3-50 characters</small>
+                    <small class="form-error" id="group-name-error"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="group-description">Description</label>
+                    <textarea 
+                        id="group-description" 
+                        name="description"
+                        class="form-input"
+                        rows="3"
+                        placeholder="What is this group about?"
+                        maxlength="200"
+                    ></textarea>
+                    <small class="form-hint">Optional, maximum 200 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="group-whatsapp-url">WhatsApp Group Invite Link</label>
+                    <input 
+                        type="url" 
+                        id="group-whatsapp-url" 
+                        name="whatsappGroupUrl"
+                        class="form-input"
+                        placeholder="https://chat.whatsapp.com/..."
+                    >
+                    <small class="form-hint">Optional - Add your WhatsApp group invite link</small>
+                    <small class="form-error" id="group-whatsapp-error"></small>
+                </div>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="create-group-modal" type="button">
+                Cancel
+            </button>
+            <button id="create-group-btn" class="btn btn-primary" type="button">
+                Create Group
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/components/groups-list-component/groups-list-component.js"></script>

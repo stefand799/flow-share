@@ -1,0 +1,8 @@
+@import url('profile-component/profile-component.css');
+@import url('groups-list-component/groups-list-component.css');
+
+
+@import url('group-component/group-component.css');
+@import url('members-component/members-component.css');
+@import url('kanban-component/kanban-component.css');
+@import url('finance-component/finance-component.css');

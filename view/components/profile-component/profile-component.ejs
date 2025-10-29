@@ -1,0 +1,184 @@
+<div class="profile-card" id="profile-card" data-user-id="<%= user.id %>">
+    
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <span class="avatar-initials">
+                <%= user.username.substring(0, 2).toUpperCase() %>
+            </span>
+        </div>
+        <div class="profile-name">
+            <h3><%= user.username %></h3>
+            <% if (user.firstName || user.lastName) { %>
+                <p class="full-name"><%= user.firstName %> <%= user.lastName %></p>
+            <% } %>
+        </div>
+    </div>
+    
+    <div class="profile-details">
+        
+        <div class="detail-item">
+            <span class="detail-icon">✉️</span>
+            <div class="detail-text">
+                <span class="detail-label">Email</span>
+                <span class="detail-value"><%= user.emailAddress %></span>
+            </div>
+        </div>
+        
+        <% if (user.phoneNumber) { %>
+        <div class="detail-item">
+            <span class="detail-icon">📱</span>
+            <div class="detail-text">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value"><%= user.phoneNumber %></span>
+            </div>
+        </div>
+        <% } %>
+        
+        <% if (user.bio) { %>
+        <div class="detail-item bio">
+            <span class="detail-icon">📝</span>
+            <div class="detail-text">
+                <span class="detail-label">Bio</span>
+                <span class="detail-value bio-text"><%= user.bio %></span>
+            </div>
+        </div>
+        <% } %>
+        
+    </div>
+    
+    <div class="profile-actions">
+        <button id="edit-profile-btn" class="btn btn-primary btn-block" type="button">
+            ✏️ Edit Profile
+        </button>
+        <button id="delete-account-btn" class="btn btn-danger btn-block" type="button">
+            🗑️ Delete Account
+        </button>
+    </div>
+    
+</div>
+
+<div id="edit-profile-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Profile</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-profile-form">
+                
+                <div class="form-group">
+                    <label for="edit-username">Username</label>
+                    <input 
+                        type="text" 
+                        id="edit-username" 
+                        class="form-input"
+                        value="<%= user.username %>"
+                        readonly
+                        disabled
+                    >
+                    <small class="form-hint">Username cannot be changed</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-firstName">First Name</label>
+                    <input 
+                        type="text" 
+                        id="edit-firstName" 
+                        name="firstName"
+                        class="form-input"
+                        value="<%= user.firstName || '' %>"
+                        placeholder="Enter your first name"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-lastName">Last Name</label>
+                    <input 
+                        type="text" 
+                        id="edit-lastName" 
+                        name="lastName"
+                        class="form-input"
+                        value="<%= user.lastName || '' %>"
+                        placeholder="Enter your last name"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-phoneNumber">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="edit-phoneNumber" 
+                        name="phoneNumber"
+                        class="form-input"
+                        value="<%= user.phoneNumber || '' %>"
+                        placeholder="Enter your phone number"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-bio">Bio</label>
+                    <textarea 
+                        id="edit-bio" 
+                        name="bio"
+                        class="form-input"
+                        rows="3"
+                        placeholder="Tell us about yourself..."
+                    ><%= user.bio || '' %></textarea>
+                    <small class="form-hint">Maximum 200 characters</small>
+                </div>
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="edit-profile-modal" type="button">
+                Cancel
+            </button>
+            <button id="save-profile-btn" class="btn btn-primary" type="button">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="delete-account-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Delete Account</h3>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="warning-text">
+                ⚠️ <strong>Warning:</strong> This action cannot be undone. 
+                Deleting your account will permanently remove:
+            </p>
+            <ul class="warning-list">
+                <li>Your profile information</li>
+                <li>All your groups and group memberships</li>
+                <li>All tasks and expenses you created</li>
+                <li>Your account access</li>
+            </ul>
+            <p class="confirmation-prompt">
+                Type <strong>"DELETE"</strong> to confirm:
+            </p>
+            <input 
+                type="text" 
+                id="delete-confirmation-input" 
+                class="form-input"
+                placeholder="Type DELETE to confirm"
+                autocomplete="off"
+            >
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-close-modal="delete-account-modal" type="button">
+                Cancel
+            </button>
+            <button id="confirm-delete-btn" class="btn btn-danger" type="button" disabled>
+                Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/components/profile-component/profile-component.js"></script>
