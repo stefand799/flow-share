@@ -25,8 +25,8 @@
         <% if (expenses && expenses.length > 0) { %>
             <% expenses.forEach(expense => { 
                 // Calculate balance and status
-                const totalContributed = expense.contributions
-                    ? expense.contributions.reduce((sum, c) => sum + c.value, 0)
+                const totalContributed = expense.Contributions
+                    ? expense.Contributions.reduce((sum, c) => sum + c.value, 0)
                     : 0;
                 const balance = expense.value - totalContributed;
                 const isPaid = balance <= 0;
@@ -103,11 +103,11 @@
                         <!-- Contributions List -->
                         <div class="contributions-section">
                             <h5 class="contributions-title">
-                                Contributions (<%= expense.contributions ? expense.contributions.length : 0 %>)
+                                Contributions (<%= expense.Contributions ? expense.Contributions.length : 0 %>)
                             </h5>
-                            <% if (expense.contributions && expense.contributions.length > 0) { %>
+                            <% if (expense.Contributions && expense.Contributions.length > 0) { %>
                                 <ul class="contributions-list">
-                                    <% expense.contributions.forEach(contribution => { 
+                                    <% expense.Contributions.forEach(contribution => { 
                                         const contributor = members.find(m => m.id === contribution.groupMemberId);
                                         const username = contributor ? 
                                             contributor.user.username : 'Unknown';

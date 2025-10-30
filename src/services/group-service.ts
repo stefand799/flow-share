@@ -92,8 +92,17 @@ export const getGroupsOfUser = async (user: User): Promise<Group[]> => {
             userId: user.id,
         },
         include: {
-            group: true,
-        },
+            group: {                     
+                include: {               
+                    _count: {            
+                        select: {
+                            Members: true,
+                            Tasks: true,
+                        }
+                    }
+                }
+            }
+        }
     });
 
     const groups = groupMemberships.map(membership => membership.group);

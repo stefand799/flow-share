@@ -226,8 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const { expense } = await response.json();
         
         // Calculate balance
-        const totalContributed = expense.contributions
-            ? expense.contributions.reduce((sum, c) => sum + c.value, 0)
+        const totalContributed = expense.Contributions
+            ? expense.Contributions.reduce((sum, c) => sum + c.value, 0)
             : 0;
         const balance = expense.value - totalContributed;
         

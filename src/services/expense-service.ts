@@ -90,6 +90,17 @@ export const getAllExpenses = async (groupId: number): Promise<Expense[]> => {
         where: { 
             groupId: groupId 
         },
+        include: {
+            Contributions: {
+                include: {
+                    member: {
+                        include: {
+                            user: true
+                        }
+                    }
+                }
+            }
+        },
         orderBy: {
             createdAt: 'desc',
         }
@@ -105,7 +116,18 @@ export const getAllExpenses = async (groupId: number): Promise<Expense[]> => {
  */
 export const getExpenseById = async (expenseId: number): Promise<Expense | null> => {
     const expense = await prisma.expense.findUnique({
-        where: { id: expenseId }
+        where: { id: expenseId },
+        include: {
+            Contributions: {
+                include: {
+                    member: {
+                        include: {
+                            user: true
+                        }
+                    }
+                }
+            }
+        }
     });
 
     return expense;
