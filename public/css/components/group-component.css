@@ -70,6 +70,29 @@
     word-break: break-word;
 }
 
+.whatsapp-link {
+    color: #25D366;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.whatsapp-link:hover {
+    color: #128C7E;
+    text-decoration: underline;
+    background-color: rgba(37, 211, 102, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: -2px -6px;
+}
+
+.whatsapp-link:active {
+    color: #075E54;
+}
+
 /* ============================================
    GROUP ACTIONS
 ============================================ */
@@ -123,6 +146,11 @@
     resize: vertical;
     min-height: 80px;
     max-height: 200px;
+}
+
+.input-error {
+    border-color: #e53e3e !important;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
 }
 
 /* ============================================

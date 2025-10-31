@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form inputs
     const groupNameInput = document.getElementById('group-name');
     const groupDescriptionInput = document.getElementById('group-description');
+    const groupWhatsappInput = document.getElementById('group-whatsapp-url');
     
     // ============================================
     // CAROUSEL STATE
@@ -298,6 +299,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Validate inputs
             const name = groupNameInput.value.trim();
             const description = groupDescriptionInput.value.trim();
+            const whatsappUrl = groupWhatsappInput?.value.trim() || '';
+            
+            // Debug logging
+            console.log('Creating group with data:', {
+                name,
+                description,
+                whatsappUrl
+            });
             
             if (!name || name.length < 3) {
                 showError('Group name must be at least 3 characters');
@@ -313,16 +322,27 @@ document.addEventListener('DOMContentLoaded', () => {
             createGroupBtn.disabled = true;
             createGroupBtn.textContent = 'Creating...';
             
+            const requestBody = { 
+                name, 
+                description: description || null,
+                whatsappGroupUrl: whatsappUrl || null
+            };
+            
+            console.log('Request body:', requestBody);
+            
             // Make API request
             const response = await fetch('/api/groups', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, description })
+                body: JSON.stringify(requestBody)
             });
             
+            console.log('Response status:', response.status);
+            
             const data = await response.json();
+            console.log('Response data:', data);
             
             if (response.ok) {
                 showSuccess('Group created successfully!');

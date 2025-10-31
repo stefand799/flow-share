@@ -33,10 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveGroupBtn = document.getElementById('save-group-btn');
     const editGroupNameInput = document.getElementById('edit-group-name');
     const editGroupDescriptionInput = document.getElementById('edit-group-description');
+    const editWhatsappUrlInput = document.getElementById('edit-whatsapp-url');
     
     // Delete Group
     const confirmDeleteGroupBtn = document.getElementById('confirm-delete-group-btn');
     const deleteGroupConfirmationInput = document.getElementById('delete-group-confirmation-input');
+    
+    // ============================================
+    // WHATSAPP URL VALIDATION
+    // ============================================
+    
+    // Frontend validation commented out - handled by backend
+    /*
+    function isValidWhatsAppUrl(url) {
+        if (!url || url.trim() === '') {
+            return true; // Empty is valid (optional field)
+        }
+        const whatsappPattern = /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+$/;
+        return whatsappPattern.test(url.trim());
+    }
+    
+    // Add validation listener to WhatsApp input
+    if (editWhatsappUrlInput) {
+        editWhatsappUrlInput.addEventListener('input', function() {
+            const url = this.value.trim();
+            // Only validate if there's content
+            if (url && !isValidWhatsAppUrl(url)) {
+                showError('whatsapp-url-error', 'Please enter a valid WhatsApp invite link (e.g., https://chat.whatsapp.com/...)');
+                this.classList.add('input-error');
+            } else {
+                clearError('whatsapp-url-error');
+                this.classList.remove('input-error');
+            }
+        });
+    }
+    */
     
     // ============================================
     // ADD MEMBER FUNCTIONALITY
@@ -113,11 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const name = editGroupNameInput.value.trim();
             const description = editGroupDescriptionInput.value.trim();
+            const whatsappUrl = editWhatsappUrlInput?.value.trim() || '';
             
             if (!name || name.length < 3) {
                 showError('group-name-error', 'Group name must be at least 3 characters');
                 return;
             }
+            
+            // WhatsApp URL validation removed - handled by backend
             
             saveGroupBtn.disabled = true;
             saveGroupBtn.textContent = 'Saving...';
@@ -125,7 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/api/groups/${groupId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, description: description || null })
+                body: JSON.stringify({ 
+                    name, 
+                    description: description || null,
+                    whatsappGroupUrl: whatsappUrl || null
+                })
             });
             
             if (!response.ok) {

@@ -6,12 +6,13 @@
      - Group name and description
      - Creation date
      - Member count
+     - WhatsApp group link (if available)
      - Action buttons (Add Member, Edit, Delete)
      - Only admins see Edit/Delete buttons
      
      Includes modals for:
      - Add member
-     - Edit group
+     - Edit group (with WhatsApp URL)
      - Delete group confirmation
 ============================================ -->
 
@@ -31,6 +32,20 @@
                 <%= group.description || 'No description provided' %>
             </span>
         </div>
+        
+        <% if (group.whatsappGroupUrl) { %>
+        <div class="detail-row">
+            <span class="detail-label">WhatsApp Group</span>
+            <span class="detail-value">
+                <a href="<%= group.whatsappGroupUrl %>" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="whatsapp-link">
+                    💬 Open WhatsApp Group
+                </a>
+            </span>
+        </div>
+        <% } %>
         
         <div class="detail-row">
             <span class="detail-label">Created</span>
@@ -149,6 +164,21 @@
                         maxlength="200"
                     ><%= group.description || '' %></textarea>
                     <small class="form-hint">Optional, maximum 200 characters</small>
+                </div>
+                
+                <!-- WhatsApp Group URL -->
+                <div class="form-group">
+                    <label for="edit-whatsapp-url">WhatsApp Group Link</label>
+                    <input 
+                        type="url" 
+                        id="edit-whatsapp-url" 
+                        name="whatsappGroupUrl"
+                        class="form-input"
+                        value="<%= group.whatsappGroupUrl || '' %>"
+                        placeholder="https://chat.whatsapp.com/..."
+                    >
+                    <small class="form-hint">Optional - Paste your WhatsApp group invite link</small>
+                    <small class="form-error" id="whatsapp-url-error"></small>
                 </div>
                 
             </form>

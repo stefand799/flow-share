@@ -13,7 +13,7 @@ interface AuthenticateRequest extends Request {
  */
 export const handleCreate = async (req: AuthenticateRequest, res: Response) => {
     const authenticatedUserId = req.user?.id;
-    const { name, description } = req.body;
+    const { name, description, whatsappGroupUrl } = req.body;
 
     if (!authenticatedUserId) {
         return res.status(401).json({ 
@@ -32,7 +32,7 @@ export const handleCreate = async (req: AuthenticateRequest, res: Response) => {
         const groupToCreate: Group = {
             name,
             description: description || null,
-            whatsappGroupUrl: null,
+            whatsappGroupUrl: whatsappGroupUrl || null,
         } as Group;
 
         const createdGroup = await GroupService.createGroup(groupToCreate);

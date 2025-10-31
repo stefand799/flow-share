@@ -24,6 +24,7 @@ export const createGroup = async (group: Group): Promise<Group | null> => {
         data: {
             name: group.name,
             description: group.description,
+            whatsappGroupUrl: group.whatsappGroupUrl,
         },
     });
 
