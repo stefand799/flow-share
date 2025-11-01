@@ -4,8 +4,10 @@
 // 
 // Features:
 // - Drag and drop tasks between columns
-// - Claim/unclaim tasks
+// - Claim/unclaim tasks (anyone can claim, claimer or admin can unclaim)
 // - Create new tasks
+// - Edit existing tasks
+// - Delete tasks
 // - Expand task details
 // - Real-time UI updates
 // ============================================
@@ -98,13 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     assignedSpan.classList.add('text-red-500');
                 }
             }
-            
-            // Refresh expanded details to show correct buttons
-            const expandedDetails = cardElement.querySelector('.task-details-expanded');
-            if (!expandedDetails.classList.contains('hidden')) {
-                expandedDetails.classList.add('hidden');
-                setTimeout(() => expandedDetails.classList.remove('hidden'), 50);
-            }
         }
     };
 
@@ -187,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================
-    // CLAIM/UNCLAIM BUTTONS
+    // CLAIM/UNCLAIM/EDIT/DELETE BUTTONS
     // ============================================
     
     kanbanBoard.addEventListener('click', async (e) => {
@@ -200,25 +195,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!taskId) return;
 
-        let result;
         if (action === 'claim') {
-            result = await updateTaskAPI(taskId, `${taskId}/claim`, 'PUT', {});
+            const result = await updateTaskAPI(taskId, `${taskId}/claim`, 'PUT', {});
+            if (result && result.success) {
+                // Refresh page to update UI with new buttons
+                window.location.reload();
+            }
         } else if (action === 'unclaim') {
-            result = await updateTaskAPI(taskId, `${taskId}/unclaim`, 'PUT', {});
-        }
-
-        if (result && result.success) {
-            // Extract assignee info from response
-            const task = result.data.task;
-            const newAssignee = task.groupMemberId 
-                ? { id: task.groupMemberId, name: 'You' } 
-                : { id: null, name: 'Unassigned' };
-            
-            updateTaskCardUI(card, null, newAssignee);
-            console.log(`Task ${taskId} ${action}ed successfully`);
-        } else if (result) {
-            console.warn(`Action failed: ${result.message}`);
-            alert(`Failed to ${action} task. ${result.message}`);
+            const result = await updateTaskAPI(taskId, `${taskId}/unclaim`, 'PUT', {});
+            if (result && result.success) {
+                // Refresh page to update UI with new buttons
+                window.location.reload();
+            }
+        } else if (action === 'edit') {
+            openEditModal(btn);
+        } else if (action === 'delete') {
+            await deleteTask(taskId, card);
         }
     });
 
@@ -226,65 +218,145 @@ document.addEventListener('DOMContentLoaded', () => {
     // CREATE TASK MODAL
     // ============================================
     
+    const createTaskBtn = document.querySelector('.create-task-btn');
     const createTaskModal = document.getElementById('create-task-modal');
     const createTaskForm = document.getElementById('create-task-form');
-    const cancelTaskBtn = document.getElementById('cancel-task-create-btn');
+    const cancelCreateBtn = document.getElementById('cancel-task-create-btn');
 
-    // Open modal when clicking "New Task" button
-    kanbanBoard.addEventListener('click', (e) => {
-        if (e.target.classList.contains('create-task-btn') || 
-            e.target.closest('.create-task-btn')) {
+    if (createTaskBtn) {
+        createTaskBtn.addEventListener('click', () => {
             createTaskModal.classList.remove('hidden');
-        }
-    });
+        });
+    }
 
-    // Close modal on cancel
-    if (cancelTaskBtn) {
-        cancelTaskBtn.addEventListener('click', () => {
+    if (cancelCreateBtn) {
+        cancelCreateBtn.addEventListener('click', () => {
             createTaskModal.classList.add('hidden');
             createTaskForm.reset();
         });
     }
 
-    // Close modal when clicking outside
-    createTaskModal.addEventListener('click', (e) => {
-        if (e.target === createTaskModal) {
-            createTaskModal.classList.add('hidden');
-            createTaskForm.reset();
-        }
-    });
-
-    // Handle form submission
     if (createTaskForm) {
         createTaskForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(createTaskForm);
-            const taskData = Object.fromEntries(formData.entries());
-            taskData.groupId = parseInt(groupID);
-            taskData.stage = 'TO_DO'; // New tasks start in TO_DO
+            const taskData = {
+                name: formData.get('name'),
+                description: formData.get('description') || null,
+                due: formData.get('due') || null,
+                groupId: groupID
+            };
 
-            try {
-                // Call correct API endpoint: POST /api/tasks
-                const response = await fetch('/api/tasks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(taskData),
-                });
+            const result = await updateTaskAPI('', '', 'POST', taskData);
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to create task.');
-                }
-
-                // Success - reload page to show new task
+            if (result && result.success) {
                 console.log('Task created successfully');
                 window.location.reload();
-
-            } catch (error) {
-                console.error('Error creating task:', error);
+            } else {
                 alert('Failed to create task. Please try again.');
             }
         });
     }
+
+    // ============================================
+    // EDIT TASK MODAL
+    // ============================================
+    
+    const editTaskModal = document.getElementById('edit-task-modal');
+    const editTaskForm = document.getElementById('edit-task-form');
+    const cancelEditBtn = document.getElementById('cancel-task-edit-btn');
+
+    function openEditModal(editBtn) {
+        const taskId = editBtn.dataset.taskId;
+        const taskName = editBtn.dataset.taskName;
+        const taskDescription = editBtn.dataset.taskDescription;
+        const taskDue = editBtn.dataset.taskDue;
+
+        document.getElementById('edit-task-id').value = taskId;
+        document.getElementById('edit-task-name').value = taskName;
+        document.getElementById('edit-task-description').value = taskDescription;
+        document.getElementById('edit-task-due').value = taskDue;
+
+        editTaskModal.classList.remove('hidden');
+    }
+
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            editTaskModal.classList.add('hidden');
+            editTaskForm.reset();
+        });
+    }
+
+    if (editTaskForm) {
+        editTaskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(editTaskForm);
+            const taskId = formData.get('id');
+            const taskData = {
+                name: formData.get('name'),
+                description: formData.get('description') || null,
+                due: formData.get('due') || null
+            };
+
+            const result = await updateTaskAPI(taskId, taskId, 'PUT', taskData);
+
+            if (result && result.success) {
+                console.log('Task updated successfully');
+                window.location.reload();
+            } else {
+                alert('Failed to update task. Please try again.');
+            }
+        });
+    }
+
+    // ============================================
+    // DELETE TASK
+    // ============================================
+    
+    async function deleteTask(taskId, cardElement) {
+        if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+            return;
+        }
+
+        const result = await updateTaskAPI(taskId, taskId, 'DELETE', {});
+
+        if (result && result.success) {
+            // Remove card from DOM
+            const column = cardElement.closest('.kanban-column');
+            const stage = column.dataset.stage;
+            const countElement = document.getElementById(`count-${stage}`);
+            
+            cardElement.remove();
+            
+            // Update count
+            if (countElement) {
+                countElement.textContent = parseInt(countElement.textContent) - 1;
+            }
+            
+            console.log('Task deleted successfully');
+        } else {
+            alert('Failed to delete task. Please try again.');
+        }
+    }
+
+    // ============================================
+    // CLOSE MODALS ON OUTSIDE CLICK
+    // ============================================
+    
+    [createTaskModal, editTaskModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    if (modal === createTaskModal) {
+                        createTaskForm.reset();
+                    } else if (modal === editTaskModal) {
+                        editTaskForm.reset();
+                    }
+                }
+            });
+        }
+    });
 });

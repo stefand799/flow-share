@@ -20,10 +20,10 @@ export const handleCreate = async (req: AuthenticateRequest, res: Response) => {
         });
     }
 
-    // Validate required fields
-    if (!name || !due || !groupId) {
+    // Validate required fields - due date is now optional
+    if (!name || !groupId) {
         return res.status(400).json({ 
-            message: "Task name, due date, and group ID are required." 
+            message: "Task name and group ID are required." 
         });
     }
 
@@ -31,7 +31,7 @@ export const handleCreate = async (req: AuthenticateRequest, res: Response) => {
         const newTask: Task = {
             name,
             description: description || null,
-            due: new Date(due),
+            due: due ? new Date(due) : null,
             groupId: parseInt(groupId),
             stage: Stage.TO_DO,
             groupMemberId: null,
@@ -138,6 +138,7 @@ export const handleGetTask = async (req: AuthenticateRequest, res: Response) => 
 export const handleUpdate = async (req: AuthenticateRequest, res: Response) => {
     const authenticatedUserId = req.user?.id;
     const taskId = parseInt(req.params.taskId);
+    const { name, description, due } = req.body;
 
     if (!authenticatedUserId) {
         return res.status(401).json({ 
@@ -151,16 +152,23 @@ export const handleUpdate = async (req: AuthenticateRequest, res: Response) => {
         });
     }
 
+    if (!name) {
+        return res.status(400).json({ 
+            message: "Task name is required." 
+        });
+    }
+
     try {
-        const taskToUpdate: Task = {
-            ...req.body,
+        const updatedTask: Task = {
             id: taskId,
-            due: req.body.due ? new Date(req.body.due) : undefined
+            name,
+            description: description || null,
+            due: due ? new Date(due) : null,
         } as Task;
 
-        const updatedTask = await TaskService.updateTask(taskToUpdate);
+        const result = await TaskService.updateTask(updatedTask);
 
-        if (!updatedTask) {
+        if (!result) {
             return res.status(404).json({ 
                 message: "Task not found." 
             });
@@ -168,7 +176,7 @@ export const handleUpdate = async (req: AuthenticateRequest, res: Response) => {
 
         return res.status(200).json({ 
             message: "Task updated successfully.",
-            task: updatedTask 
+            task: result 
         });
     } catch (err: any) {
         console.error("Error in handleUpdate:", err);

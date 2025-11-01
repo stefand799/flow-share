@@ -123,7 +123,7 @@ model Task {
   name           String
   description    String?
   stage          Stage         @default(TO_DO)
-  due            DateTime      @map("due_date")
+  due            DateTime?     @map("due_date")
 
   // Relationships
   group          Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
