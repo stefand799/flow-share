@@ -40,7 +40,7 @@ CREATE TABLE "tasks" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "stage" TEXT NOT NULL DEFAULT 'TO_DO',
-    "due_date" DATETIME NOT NULL,
+    "due_date" DATETIME,
     "group_id" INTEGER NOT NULL,
     "group_member_id" INTEGER,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
